@@ -1,0 +1,9 @@
+/build/
+/devel/
+/logs/
+/.catkin_tools/
+/src/openslam_gmapping/
+/src/slam_gmapping/
+/src/geometry2/
+/src/navigation/
+/src/navigation_msgs/
