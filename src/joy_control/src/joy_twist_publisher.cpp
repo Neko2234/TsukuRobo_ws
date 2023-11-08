@@ -18,18 +18,18 @@ public:
     // ジョイコンの割り当て(launchファイルから設定)
     int assign_x = 1;
     int assign_y = 0;
-    int assign_z = 3;
-    pnh_.getParam("assign_x", assign_x);
-    pnh_.getParam("assign_y", assign_y);
-    pnh_.getParam("assign_z", assign_z);
+    int assign_z = 2;
+    pnh_.getParam("/joy/assign_x", assign_x);
+    pnh_.getParam("/joy/assign_y", assign_y);
+    pnh_.getParam("/joy/assign_z", assign_z);
 
 	// 最大速度の設定(launchファイルから設定)
-    float max_x = 0.5;
-    float max_y = 0.5;
-    float max_z = 1.5;
-    pnh_.getParam("max_x", max_x);
-    pnh_.getParam("max_y", max_y);
-    pnh_.getParam("max_z", max_z);
+    float max_x = 1.0;
+    float max_y = 1.0;
+    float max_z = 1.0;
+    pnh_.getParam("/joy/max_x", max_x);
+    pnh_.getParam("/joy/max_y", max_y);
+    pnh_.getParam("/joy/max_z", max_z);
 
     geometry_msgs::Twist cmd_vel;
     if(0 <= assign_x && assign_x < last_joy_.axes.size()){
@@ -56,6 +56,11 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "joy_twist_publisher");
   TwistPublisher twist_publisher;
-  ros::spin();
+
+  ros::Rate rate(100);
+  while(ros::ok()){
+  	ros::spinOnce();
+    rate.sleep();
+  }
   return 0;
 }
