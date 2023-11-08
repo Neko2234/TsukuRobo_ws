@@ -1,14 +1,16 @@
 <launch>
+	<rosparam command="load" file="$(find joy_control)/config/params.yaml" />
+	
 	<arg name="arduino" default="false"/>
 	<arg name="joystick" default="true"/>
 
 	<node name="joy_node" pkg="joy" type="joy_node" />
-	<node name="joy_twist_publisher" pkg="joy_control" type="joy_twist_publisher">
+	<node name="joy_twist_publisher" pkg="joy_control" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
 	</node>
 
 	<node name="TwoWheelDrive" pkg="joy_control" type="TwoWheelDrive">
-		<!-- <remap from="cmd_vel" to="turtle1/cmd_vel"/> -->
+		<remap from="cmd_w" to="arduino/cmd_w"/>
 	</node>
 
 	<group if="$(arg arduino)">
@@ -20,7 +22,7 @@
 
 	<group if="$(arg joystick)">
 		<node name="joystick" pkg="joy" type="joy_node" required="true">
-			<param name="dev" value="/dev/input/js2"/>
+			<param name="dev" value="/dev/input/js0"/>
 		</node>
 	</group>
 </launch>
