@@ -43,8 +43,8 @@ void loop()
 	static bool stopFlag = false;
 
 	static Cubic_controller::Velocity_PID velocityPID[]= {
-		{4, 2, Cubic_controller::encoderType::inc, 2048,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // L
-		{2, 1, Cubic_controller::encoderType::inc, 2048,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // R
+		{4, 2, Cubic_controller::encoderType::inc, 4096,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // L
+		{2, 1, Cubic_controller::encoderType::inc, 4096,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // R
 	};
 
 	velocityPID[0].setTarget(ang_vel[0]);
