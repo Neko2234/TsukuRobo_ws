@@ -19,8 +19,10 @@ ros::Publisher enc_pub("TwoWDEncoder", &wheel_enc);
 
 // 単位は[count/sec]
 void angVelCb(const custom_msgs::TwoWDAngVel& ang_vel_msg){
-	ang_vel[0] = ang_vel_msg.L;
-	ang_vel[1] = ang_vel_msg.R;
+  // ROSから来るのが100オーダーの値で、速度PIDの目標速度のオーダーが10くらいなので10で割ってる
+  // ロボットにとって前方向への移動のとき左タイヤは正方向、右タイヤは負方向に回転するので符号をつけて補正している。
+	ang_vel[0] = static_cast<float>(ang_vel_msg.L) / 10;
+	ang_vel[1] = -static_cast<float>(ang_vel_msg.R) / 10;
 }
 
 ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("TwoWDAngVel", &angVelCb);
@@ -43,12 +45,12 @@ void loop()
 	static bool stopFlag = false;
 
 	static Cubic_controller::Velocity_PID velocityPID[]= {
-		{4, 2, Cubic_controller::encoderType::inc, 4096,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // L
-		{2, 1, Cubic_controller::encoderType::inc, 4096,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // R
+		{0, 0, Cubic_controller::encoderType::inc, 2048 * 4, 0.8, 0.5, 1.0, 0.1, 0.1, 0.0, false, false}, // L
+		{1, 1, Cubic_controller::encoderType::inc, 2048 * 4, 0.8, 0.5, 1.0, 0.1, 0.1, 0.0, false, false}, // R
 	};
 
-	velocityPID[0].setTarget(ang_vel[0]);
-	velocityPID[1].setTarget(ang_vel[1]);
+	velocityPID[LEFT_MOTOR].setTarget(ang_vel[0]);
+	velocityPID[RIGHT_MOTOR].setTarget(ang_vel[1]);
 
 	wheel_enc.L = Inc_enc::get(LEFT_MOTOR);
 	wheel_enc.R = Inc_enc::get(RIGHT_MOTOR);
@@ -59,8 +61,8 @@ void loop()
 	{
 		// Serial.println("stopping...");
 
-		velocityPID[0].reset();
-		velocityPID[1].reset();
+		velocityPID[LEFT_MOTOR].reset();
+		velocityPID[RIGHT_MOTOR].reset();
 		
 		for (int i = 0; i < 8; i++)
 		{
@@ -69,8 +71,8 @@ void loop()
 	}
 	else
 	{
-		velocityPID[0].compute();
-		velocityPID[1].compute();
+		velocityPID[LEFT_MOTOR].compute();
+		velocityPID[RIGHT_MOTOR].compute();
 	}
 	Cubic::update();
 }
