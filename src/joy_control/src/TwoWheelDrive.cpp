@@ -58,8 +58,8 @@ class TwoWDSpeedConverter{
 		
 		// 以下をターミナルに打ち込んで表示
 		/* rosrun rqt_console rqt_console */
-		ROS_INFO("target_ang_velL:%f", ang_vel[0]);
-		ROS_INFO("target_ang_velL:%f", ang_vel[1]);
+		ROS_DEBUG("target_ang_velL:%f", ang_vel[0]);
+		ROS_DEBUG("target_ang_velR:%f", ang_vel[1]);
 		
 		// 角速度を[rad/s]からエンコーダの[count/s]に変換
 		custom_msgs::TwoWDAngVel cmd_w;

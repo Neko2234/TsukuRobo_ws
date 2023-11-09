@@ -1,2 +1,2 @@
-int16 L
-int16 R
+float32 L
+float32 R
