@@ -5,7 +5,7 @@ joy: {
 
   max_x: -0.05,
   max_y: 0.05,
-  max_z: 0.05,
+  max_z: 0.025,
 }
 
 twoWD: {
@@ -19,6 +19,6 @@ twoWD: {
 
 Arduino: {
   # PIDの順
-  gainL: [2.0, 0.1, 0.1],
-  gainR: [2.0, 0.1, 0.1],
+  gainL: [3.3, 1.0, 0.0],
+  gainR: [3.3, 1.0, 0.0],
 }
