@@ -16,3 +16,9 @@ twoWD: {
   tires_dist: 0.3,
   encoder_cpr: 8192,
 }
+
+Arduino: {
+  # PIDの順
+  gainL: [2.0, 0.1, 0.1],
+  gainR: [2.0, 0.1, 0.1],
+}
