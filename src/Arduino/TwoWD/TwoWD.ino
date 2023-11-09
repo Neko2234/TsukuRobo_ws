@@ -85,8 +85,8 @@ void loop()
 	wheel_enc.R = Inc_enc::get(RIGHT_MOTOR);
 
 	enc_pub.publish(&wheel_enc);
-  gainL_pub.publish(&gainL_msg);
-  gainR_pub.publish(&gainR_msg);
+//  gainL_pub.publish(&gainL_msg);
+//  gainR_pub.publish(&gainR_msg);
 
 	if (stopFlag)
 	{
@@ -103,7 +103,7 @@ void loop()
 	}
 	else
 	{
-    nh.loginfo("Culculating");
+//    nh.loginfo("Culculating");
 		velocityPID[0].compute();
 		velocityPID[1].compute();
 	}
