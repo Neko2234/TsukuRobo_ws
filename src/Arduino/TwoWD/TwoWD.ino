@@ -24,6 +24,8 @@ ros::Publisher gainR_pub("Arduino/gainR", &gainR_msg);
 
 // 単位は[count/sec]
 void angVelCb(const custom_msgs::TwoWDAngVel& ang_vel_msg){
+  // ROSから来るのが100オーダーの値で、速度PIDの目標速度のオーダーが10くらいなので10で割ってる
+  // ロボットにとって前方向への移動のとき左タイヤは正方向、右タイヤは負方向に回転するので符号をつけて補正している。
 	ang_vel[LEFT_MOTOR] = ang_vel_msg.L / 10;
 	ang_vel[RIGHT_MOTOR] = -ang_vel_msg.R / 10;
 }
@@ -93,8 +95,8 @@ void loop()
 		// Serial.println("stopping...");
     nh.loginfo("Stopping...");
 
-		velocityPID[0].reset();
-		velocityPID[1].reset();
+		velocityPID[LEFT_MOTOR].reset();
+		velocityPID[RIGHT_MOTOR].reset();
 		
 		for (int i = 0; i < 8; i++)
 		{
@@ -104,8 +106,8 @@ void loop()
 	else
 	{
 //    nh.loginfo("Culculating");
-		velocityPID[0].compute();
-		velocityPID[1].compute();
+		velocityPID[LEFT_MOTOR].compute();
+		velocityPID[RIGHT_MOTOR].compute();
 	}
 	Cubic::update();
 }
