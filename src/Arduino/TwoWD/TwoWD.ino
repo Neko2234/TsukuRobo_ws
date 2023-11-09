@@ -10,20 +10,20 @@
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
 
-float ang_vel[2] = {0,0}; 
+float ang_vel[2] = {0.0, 0.0};
 
 custom_msgs::WheelEnc wheel_enc;
 
 ros::NodeHandle nh;
-ros::Publisher enc_pub("TwoWDEncoder", &wheel_enc);
+ros::Publisher enc_pub("TwoWD/encoder", &wheel_enc);
 
 // 単位は[count/sec]
 void angVelCb(const custom_msgs::TwoWDAngVel& ang_vel_msg){
-	ang_vel[0] = ang_vel_msg.L;
-	ang_vel[1] = ang_vel_msg.R;
+	ang_vel[LEFT_MOTOR] = ang_vel_msg.L / 10;
+	ang_vel[RIGHT_MOTOR] = -ang_vel_msg.R / 10;
 }
 
-ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("TwoWDAngVel", &angVelCb);
+ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("arduino/cmd_w", &angVelCb);
 
 void setup()
 {
@@ -43,12 +43,12 @@ void loop()
 	static bool stopFlag = false;
 
 	static Cubic_controller::Velocity_PID velocityPID[]= {
-		{4, 2, Cubic_controller::encoderType::inc, 4096,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // L
-		{2, 1, Cubic_controller::encoderType::inc, 4096,0.7, 0.5, 0.08, 0.0, 0.0001, 0.1, false, true}, // R
+		{0, 0, Cubic_controller::encoderType::inc, 2048*4,0.7, 0.5, 1.0, 0.1, 0.1, 0.0, false, true}, // L
+		{1, 1, Cubic_controller::encoderType::inc, 2048*4,0.7, 0.5, 1.0, 0.1, 0.1, 0.0, false, true}, // R
 	};
 
-	velocityPID[0].setTarget(ang_vel[0]);
-	velocityPID[1].setTarget(ang_vel[1]);
+	velocityPID[0].setTarget(ang_vel[LEFT_MOTOR]);
+	velocityPID[1].setTarget(ang_vel[RIGHT_MOTOR]);
 
 	wheel_enc.L = Inc_enc::get(LEFT_MOTOR);
 	wheel_enc.R = Inc_enc::get(RIGHT_MOTOR);
