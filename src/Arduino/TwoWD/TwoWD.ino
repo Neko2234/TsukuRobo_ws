@@ -28,7 +28,7 @@ void angVelCb(const custom_msgs::TwoWDAngVel& ang_vel_msg){
 	ang_vel[RIGHT_MOTOR] = -ang_vel_msg.R / 10;
 }
 
-ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("Arduino/cmd_w", &angVelCb);
+ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("arduino/cmd_w", &angVelCb);
 
 void setup()
 {
