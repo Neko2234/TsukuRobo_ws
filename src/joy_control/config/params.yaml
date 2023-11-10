@@ -2,10 +2,12 @@ joy: {
   assign_x: 0,
   assign_y: 1,
   assign_z: 2,
+  assign_arm: 4,
 
   max_x: -0.05,
   max_y: 0.05,
   max_z: 0.05,
+  max_arm: 0.05,
 }
 
 twoWD: {
