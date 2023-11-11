@@ -53,15 +53,15 @@ void setup()
 
   if(!nh.getParam("/Arduino/gainL", gainL_msg.data, 3)){
     // default values
-    gainL_msg.data[0] = 1.0; // P
-    gainL_msg.data[1] = 0.1; // I
-    gainL_msg.data[2] = 0.1; // D
+    gainL_msg.data[0] = 7.0; // P
+    gainL_msg.data[1] = 1.0; // I
+    gainL_msg.data[2] = 0.3; // D
   }
   if(!nh.getParam("/Arduino/gainR", gainR_msg.data, 3)){
     // default values
-    gainR_msg.data[0] = 1.0; // P
-    gainR_msg.data[1] = 0.1; // I
-    gainR_msg.data[2] = 0.1; // D
+    gainR_msg.data[0] = 7.0; // P
+    gainR_msg.data[1] = 1.0; // I
+    gainR_msg.data[2] = 0.3; // D
   }
   
 	nh.subscribe(ang_vel_sub);
@@ -75,25 +75,33 @@ void loop()
 	nh.spinOnce();
 	static bool stopFlag = false;
 
+//  nh.getParam("/Arduino/gainL", gainL_msg.data, 3);
+//  nh.getParam("/Arduino/gainR", gainR_msg.data, 3);
+
 	static Cubic_controller::Velocity_PID velocityPID[]= {
 		{0, 0, Cubic_controller::encoderType::inc, 2048*4,0.7, 0.5, gainL_msg.data[0], gainL_msg.data[1], gainL_msg.data[2], 0.0, false, true}, // L
 		{1, 1, Cubic_controller::encoderType::inc, 2048*4,0.7, 0.5, gainR_msg.data[0], gainR_msg.data[1], gainR_msg.data[2], 0.0, false, true}, // R
 	};
 
-	velocityPID[0].setTarget(ang_vel[LEFT_MOTOR]);
-	velocityPID[1].setTarget(ang_vel[RIGHT_MOTOR]);
+  if(ang_vel[LEFT_MOTOR]==0 && ang_vel[RIGHT_MOTOR]==0){
+    stopFlag = true;
+  }else{
+    stopFlag = false;
+    velocityPID[LEFT_MOTOR].setTarget(ang_vel[LEFT_MOTOR]);
+    velocityPID[RIGHT_MOTOR].setTarget(ang_vel[RIGHT_MOTOR]);
+  }
 
-	wheel_enc.L = Inc_enc::get(LEFT_MOTOR);
-	wheel_enc.R = Inc_enc::get(RIGHT_MOTOR);
+	wheel_enc.L = velocityPID[LEFT_MOTOR].readEncoder();// - Inc_enc::get_diff(LEFT_MOTOR);
+	wheel_enc.R = velocityPID[RIGHT_MOTOR].readEncoder(); // - Inc_enc::get_diff(RIGHT_MOTOR);
 
-	enc_pub.publish(&wheel_enc);
+//	enc_pub.publish(&wheel_enc);
 //  gainL_pub.publish(&gainL_msg);
 //  gainR_pub.publish(&gainR_msg);
 
 	if (stopFlag)
 	{
 		// Serial.println("stopping...");
-    nh.loginfo("Stopping...");
+//    nh.loginfo("Stopping...");
 
 		velocityPID[LEFT_MOTOR].reset();
 		velocityPID[RIGHT_MOTOR].reset();
