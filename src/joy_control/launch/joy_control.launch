@@ -4,6 +4,7 @@
 	<arg name="arduino" default="false"/>
 	<arg name="joystick" default="true"/>
 	<arg name="urg" default="true"/>
+	<arg name="ArmDrive" default="true"/>
 
 	<node name="joy_node" pkg="joy" type="joy_node" />
 	<node name="joy_twist_publisher" pkg="joy_control" type="joy_twist_publisher" output="screen" required="true">
@@ -30,6 +31,12 @@
 	<group if="$(arg urg)">
 		<node pkg="urg_node" name="urg_node" type="urg_node" required="true">
 			<param name="serial_port" value="/dev/ttyACM_URG"/>
+		</node>
+	</group>
+
+	<group if="$(arg ArmDrive)">
+		<node pkg="joy_control" name="ArmDrive" type="ArmDrive" required="true">
+			<remap from="cmd_arm" to="twoWD/cmd_arm"/>
 		</node>
 	</group>
 </launch>

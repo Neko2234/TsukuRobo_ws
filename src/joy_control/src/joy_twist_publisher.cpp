@@ -53,11 +53,12 @@ public:
     {
       cmd_vel.angular.z = max_z * last_joy_.axes[assign_z];
     }
+    cmd_pub_.publish(cmd_vel);
+    
     custom_msgs::ArmVel cmd_armvel;
     if(0 <= assign_arm && assign_arm < last_joy_.axes.size()){
       cmd_armvel.vel = max_arm * last_joy_.axes[assign_arm];
     }
-    cmd_pub_.publish(cmd_vel);
     cmd_pub_.publish(cmd_armvel);
   }
 
