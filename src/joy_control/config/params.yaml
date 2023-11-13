@@ -6,8 +6,9 @@ joy: {
 
   max_x: -0.05,
   max_y: 0.05,
-  max_z: 0.05,
+  max_z: 0.025,
   max_arm: 0.05,
+
 }
 
 twoWD: {
@@ -17,4 +18,10 @@ twoWD: {
   radius: 0.1,
   tires_dist: 0.3,
   encoder_cpr: 8192,
+}
+
+Arduino: {
+  # PIDの順
+  gainL: [7.0, 1.0, 0.3],
+  gainR: [7.0, 1.0, 0.3],
 }
