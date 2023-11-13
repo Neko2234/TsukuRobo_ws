@@ -6,8 +6,8 @@
 // ロボット速度指令をタイヤへの回転速度指令に変換
 class TwoWDSpeedConverter
 {
-private:
-	float theta_now = M_PI / 2; // オドメトリ座標系から見た現在のロボットの角度(rad)
+	// private:
+	// 	float theta_now = M_PI / 2; // オドメトリ座標系から見た現在のロボットの角度(rad)
 
 public:
 	ros::NodeHandle _nh;
@@ -35,13 +35,11 @@ public:
 	{
 		float first_x = 0.;			// (m)
 		float first_y = 0.;			// (m)
-		float first_z = M_PI / 2;	// 初期位置ではロボットは正面を向く
 		float tires_dist = 0.3;		// タイヤ間の距離(m)
 		float radius = 0.1;			// タイヤの半径(m)
 		int encoder_cpr = 2048 * 4; // エンコーダのcounts per revolution [count/rev]
 		_pnh.getParam("/twoWD/first_x", first_x);
 		_pnh.getParam("/twoWD/first_y", first_y);
-		// _pnh.getParam("/twoWD/first_z", first_z);
 		_pnh.getParam("/twoWD/tires_dist", tires_dist);
 		_pnh.getParam("/twoWD/radius", radius);
 		_pnh.getParam("/twoWD/encoder_cpr", encoder_cpr);
@@ -52,16 +50,8 @@ public:
 
 		// 両輪独立駆動ロボットの逆運動学計算
 		float ang_vel[2]; // タイヤの角速度[rad/s], L,Rの順
-		if (_last_vel.angular.z == 0)
-		{
-			ang_vel[0] = cmd_v * cos(cmd_ang - M_PI / 4);
-			ang_vel[1] = cmd_v * sin(cmd_ang - M_PI / 4);
-		}
-		else
-		{
-			ang_vel[0] = -(_last_vel.angular.z * tires_dist) / (2 * radius);
-			ang_vel[1] = (_last_vel.angular.z * tires_dist) / (2 * radius);
-		}
+		ang_vel[0] = cmd_v * cos(cmd_ang - M_PI / 4);
+		ang_vel[1] = cmd_v * sin(cmd_ang - M_PI / 4);
 
 		// 以下をターミナルに打ち込んで表示
 		/* rosrun rqt_console rqt_console */
