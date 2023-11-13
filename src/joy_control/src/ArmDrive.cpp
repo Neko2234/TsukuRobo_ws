@@ -34,7 +34,7 @@ class TwoWDSpeedConverter{
 		// float first_z = M_PI/2; // 初期位置ではロボットは正面を向く
 		// float tires_dist = 0.3; // タイヤ間の距離(m)
 		// float radius = 0.1; // タイヤの半径(m)
-		 int encoder_cpr = 2048 * 4; // エンコーダのcounts per revolution [count/rev]
+		//int encoder_cpr = 2048 * 4; // エンコーダのcounts per revolution [count/rev]
 		// _pnh.getParam("/twoWD/first_x", first_x);
 		// _pnh.getParam("/twoWD/first_y", first_y);
 		// // _pnh.getParam("/twoWD/first_z", first_z);
