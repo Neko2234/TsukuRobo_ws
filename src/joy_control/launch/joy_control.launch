@@ -1,9 +1,11 @@
 <launch>
 	<rosparam command="load" file="$(find joy_control)/config/params.yaml" />
 	
+	<!-- 各ノードを起動するか否か -->
 	<arg name="arduino" default="false"/>
 	<arg name="joystick" default="true"/>
 	<arg name="urg" default="true"/>
+	<arg name="map_server" default="true"/>
 
 	<node name="joy_node" pkg="joy" type="joy_node" />
 	<node name="joy_twist_publisher" pkg="joy_control" type="joy_twist_publisher" output="screen" required="true">
@@ -30,6 +32,15 @@
 	<group if="$(arg urg)">
 		<node pkg="urg_node" name="urg_node" type="urg_node" required="true">
 			<param name="serial_port" value="/dev/ttyACM_URG"/>
+			<param name="frame_id" value="laser"/>
+		</node>
+		<!-- ロボット座標系からLiDAR座標系への静的なtfを設定(LiDARはロボットから見て後ろの方を正面とする) -->
+		<node pkg="tf" type="static_transform_publisher" name="base_link_2_laser" args="0 0 0 0 0 0 /base_link /laser 500" />
+	</group>
+
+	<group if="$(arg map_server)">
+		<node name="map_server" pkg="map_server" type="map_server" args="$(find joy_control)/map/map.yaml" >
+			<param name="frame_id" value="odom"/>
 		</node>
 	</group>
 </launch>
