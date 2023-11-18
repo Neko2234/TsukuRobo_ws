@@ -1,8 +1,9 @@
 <launch>
 	<rosparam command="load" file="$(find joy_control)/config/params.yaml" />
 	
-	<arg name="arduino" default="true"/>
+	<arg name="arduino" default="false"/>
 	<arg name="joystick" default="true"/>
+	<arg name="urg" default="true"/>
 
 	<node name="joy_node" pkg="joy" type="joy_node" />
 	<node name="joy_twist_publisher" pkg="joy_control" type="joy_twist_publisher" output="screen" required="true">
@@ -15,7 +16,7 @@
 
 	<group if="$(arg arduino)">
 		<node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
-			<param name="port" value="/dev/ttyACM0"/>
+			<param name="port" value="/dev/ttyACM_Arduino"/>
 			<param name="baud" value="80000000"/>
 		</node>
 	</group>
@@ -23,6 +24,12 @@
 	<group if="$(arg joystick)">
 		<node name="joystick" pkg="joy" type="joy_node" required="true">
 			<param name="dev" value="/dev/input/js0"/>
+		</node>
+	</group>
+
+	<group if="$(arg urg)">
+		<node pkg="urg_node" name="urg_node" type="urg_node" required="true">
+			<param name="serial_port" value="/dev/ttyACM_URG"/>
 		</node>
 	</group>
 </launch>

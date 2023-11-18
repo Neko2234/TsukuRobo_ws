@@ -27,7 +27,12 @@ public:
     pnh_.getParam("/joy/assign_y", assign_y);
     pnh_.getParam("/joy/assign_z", assign_z);
 
-    // 最大速度の設定(launchファイルから設定)
+    int assign_x_straight = 7;
+    int assign_y_straight = 6;
+    pnh_.getParam("/joy/assign_x_straight", assign_x_straight);
+    pnh_.getParam("/joy/assign_y_straight", assign_y_straight);
+
+	// 最大速度の設定(launchファイルから設定)
     float max_x = 1.0;
     float max_y = 1.0;
     float max_z = 1.0;
@@ -36,13 +41,19 @@ public:
     pnh_.getParam("/joy/max_z", max_z);
 
     geometry_msgs::Twist cmd_vel;
-    if (0 <= assign_x && assign_x < last_joy_.axes.size())
-    {
-      cmd_vel.linear.x = max_x * last_joy_.axes[assign_x];
+    if(0 <= assign_x_straight && assign_x_straight < last_joy_.axes.size()){
+      cmd_vel.linear.x = max_x * last_joy_.axes[assign_x_straight];
     }
-    if (0 <= assign_y && assign_y < last_joy_.axes.size())
-    {
-      cmd_vel.linear.y = max_y * last_joy_.axes[assign_y];
+    if(0 <= assign_y_straight && assign_y_straight < last_joy_.axes.size()){
+      cmd_vel.linear.y = max_y * last_joy_.axes[assign_y_straight];
+    }
+    if(0 <= assign_x && assign_x < last_joy_.axes.size()){
+      if(cmd_vel.linear.x == 0)
+        cmd_vel.linear.x = max_x * last_joy_.axes[assign_x];
+    }
+    if(0 <= assign_y && assign_y < last_joy_.axes.size()){
+      if(cmd_vel.linear.y == 0)
+        cmd_vel.linear.y = max_y * last_joy_.axes[assign_y];
     }
     if (0 <= assign_z && assign_z < last_joy_.axes.size())
     {
