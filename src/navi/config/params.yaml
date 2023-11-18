@@ -1,0 +1,28 @@
+joy: {
+  assign_x: 0,
+  assign_y: 1,
+  assign_z: 3,
+  assign_x_straight: 6,
+  assign_y_straight: 7,
+
+  max_x: -0.1,
+  max_y: 0.1,
+  max_z: 0.05,
+  max_x_straight: -0.1,
+  max_straight: -0.1,
+}
+
+twoWD: {
+  first_x: 0,
+  first_y: 0,
+
+  radius: 0.1,
+  tires_dist: 0.3,
+  encoder_cpr: 4096,
+}
+
+Arduino: {
+  # PIDの順
+  gainL: [14.0, 1.0, 0.3],
+  gainR: [14.0, 1.0, 0.3],
+}
