@@ -79,8 +79,8 @@ void loop()
 //  nh.getParam("/Arduino/gainR", gainR_msg.data, 3);
 
 	static Cubic_controller::Velocity_PID velocityPID[]= {
-		{0, 0, Cubic_controller::encoderType::inc, 2048*4,0.7, 0.5, gainL_msg.data[0], gainL_msg.data[1], gainL_msg.data[2], 0.0, false, true}, // L
-		{1, 1, Cubic_controller::encoderType::inc, 2048*4,0.7, 0.5, gainR_msg.data[0], gainR_msg.data[1], gainR_msg.data[2], 0.0, false, true}, // R
+		{0, 0, Cubic_controller::encoderType::inc, 1028*4,0.7, 0.5, gainL_msg.data[0], gainL_msg.data[1], gainL_msg.data[2], 0.0, false, true}, // L
+		{1, 1, Cubic_controller::encoderType::inc, 1028*4,0.7, 0.5, gainR_msg.data[0], gainR_msg.data[1], gainR_msg.data[2], 0.0, false, true}, // R
 	};
 
   if(ang_vel[LEFT_MOTOR]==0 && ang_vel[RIGHT_MOTOR]==0){
