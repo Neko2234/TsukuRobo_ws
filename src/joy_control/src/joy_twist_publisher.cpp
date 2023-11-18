@@ -2,19 +2,23 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Joy.h>
 
-class TwistPublisher{
+class TwistPublisher
+{
 public:
-  TwistPublisher() : nh_(), pnh_("~") {
+  TwistPublisher() : nh_(), pnh_("~")
+  {
     cmd_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     joy_sub_ = nh_.subscribe("joy", 10, &TwistPublisher::joyCallback, this);
     timer_ = nh_.createTimer(ros::Duration(0.1), &TwistPublisher::timerCallback, this);
   }
 
-  void joyCallback(const sensor_msgs::Joy& joy_msg) {
+  void joyCallback(const sensor_msgs::Joy &joy_msg)
+  {
     last_joy_ = joy_msg;
   }
 
-  void timerCallback(const ros::TimerEvent& e) {
+  void timerCallback(const ros::TimerEvent &e)
+  {
     // ジョイコンの割り当て(launchファイルから設定)
     int assign_x = 1;
     int assign_y = 0;
@@ -51,7 +55,8 @@ public:
       if(cmd_vel.linear.y == 0)
         cmd_vel.linear.y = max_y * last_joy_.axes[assign_y];
     }
-    if(0 <= assign_z && assign_z < last_joy_.axes.size()){
+    if (0 <= assign_z && assign_z < last_joy_.axes.size())
+    {
       cmd_vel.angular.z = max_z * last_joy_.axes[assign_z];
     }
     cmd_pub_.publish(cmd_vel);
@@ -65,14 +70,15 @@ public:
   sensor_msgs::Joy last_joy_;
 };
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   ros::init(argc, argv, "joy_twist_publisher");
   TwistPublisher twist_publisher;
 
   ros::Rate rate(100);
-  while(ros::ok()){
-  	ros::spinOnce();
+  while (ros::ok())
+  {
+    ros::spinOnce();
     rate.sleep();
   }
   return 0;
