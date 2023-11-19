@@ -31,5 +31,13 @@
 		<node pkg="urg_node" name="urg_node" type="urg_node" required="true">
 			<param name="serial_port" value="/dev/ttyACM_URG"/>
 		</node>
+		<!-- ロボット座標系からLiDAR座標系への静的なtfを設定(LiDARはロボットから見て後ろの方を正面とする) -->
+		<node pkg="tf" type="static_transform_publisher" name="base_link_2_laser" args="0 0 0 0 0 0 /base_link /laser 500" />
+	</group>
+
+	<group if="$(arg map_server)">
+		<node name="map_server" pkg="map_server" type="map_server" args="$(find joy_control)/map/map.yaml" >
+			<param name="frame_id" value="odom"/>
+		</node>
 	</group>
 </launch>
