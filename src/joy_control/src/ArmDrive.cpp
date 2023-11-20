@@ -18,7 +18,7 @@ class TwoWDSpeedConverter{
 
 	// コンストラクタ
 	TwoWDSpeedConverter() : _nh(), _pnh("~"){
-		_arm_pub = _nh.advertise<custom_msgs::ArmVel>("cmd_arm",1);
+		_arm_pub = _nh.advertise<custom_msgs::ArmVel>("arm_vel",1);
 		_vel_sub = _nh.subscribe("cmd_armvel", 10, &TwoWDSpeedConverter::velCb, this);
 		// 10Hzでタイマーコールバックを呼び出す。
 		_timer = _nh.createTimer(ros::Duration(0.1), &TwoWDSpeedConverter::timerCb, this);
@@ -35,10 +35,10 @@ class TwoWDSpeedConverter{
 		ROS_INFO("target_arm_vel:%f", _last_vel.vel);
 		
 		// 角速度を[rad/s]からエンコーダの[count/s]に変換
-		custom_msgs::ArmVel cmd_arm;
-		cmd_arm.vel = _last_vel.vel;
+		custom_msgs::ArmVel arm_vel;
+		arm_vel.vel = _last_vel.vel;
 
-		_arm_pub.publish(cmd_arm);
+		_arm_pub.publish(arm_vel);
 	}
 };
 

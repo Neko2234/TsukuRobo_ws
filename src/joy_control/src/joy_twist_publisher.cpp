@@ -9,6 +9,7 @@ public:
   TwistPublisher() : nh_(), pnh_("~")
   {
     cmd_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    cmd_armpub_ = nh_.advertise<custom_msgs::ArmVel>("cmd_armvel", 1);
     joy_sub_ = nh_.subscribe("joy", 10, &TwistPublisher::joyCallback, this);
     timer_ = nh_.createTimer(ros::Duration(0.1), &TwistPublisher::timerCallback, this);
   }
@@ -59,12 +60,13 @@ public:
     if(0 <= assign_arm && assign_arm < last_joy_.axes.size()){
       cmd_armvel.vel = max_arm * last_joy_.axes[assign_arm];
     }
-    cmd_pub_.publish(cmd_armvel);
+    cmd_armpub_.publish(cmd_armvel);
   }
 
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
   ros::Publisher cmd_pub_;
+  ros::Publisher cmd_armpub_;
   ros::Subscriber joy_sub_;
   ros::Timer timer_;
   sensor_msgs::Joy last_joy_;

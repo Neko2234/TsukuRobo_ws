@@ -1,1 +1,1 @@
-int16 vel
+float32 vel
