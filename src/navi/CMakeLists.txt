@@ -10,6 +10,9 @@ project(navi)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  custom_msgs
+  tf2
+  tf2_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -203,3 +206,16 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+include_directories(include ${catkin_INCLUDE_DIRS})
+add_executable(joy_twist_publisher src/joy_twist_publisher.cpp)
+target_link_libraries(joy_twist_publisher
+  ${catkin_LIBRARIES}
+)
+add_executable(TwoWheelDrive src/TwoWheelDrive.cpp)
+target_link_libraries(TwoWheelDrive
+  ${catkin_LIBRARIES}
+)
+add_executable(Odometry src/Odometry.cpp)
+target_link_libraries(Odometry
+  ${catkin_LIBRARIES}
+)

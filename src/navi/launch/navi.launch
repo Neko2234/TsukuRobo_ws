@@ -4,8 +4,9 @@
 	<arg name="arduino" default="false"/>
 	<arg name="joystick" default="true"/>
 	<arg name="urg" default="true"/>
+	<arg name="map_server" default="false"/>
+	<arg name="odom" default="true"/>
 
-	<node name="joy_node" pkg="joy" type="joy_node" />
 	<node name="joy_twist_publisher" pkg="joy_control" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
 	</node>
@@ -14,6 +15,10 @@
 		<remap from="cmd_w" to="arduino/cmd_w"/>
 		<remap from="wheelVel" to="twoWD/wheelVel"/>
 	</node>
+
+	<group if="$(arg odom)">
+		<node name="odom" pkg="joy_control" type="odom" output="screen" required="true"/>
+	</group>
 
 	<group if="$(arg arduino)">
 		<node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
