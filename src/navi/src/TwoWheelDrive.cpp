@@ -35,7 +35,7 @@ public:
 	{
 		float first_x = 0.;			// (m)
 		float first_y = 0.;			// (m)
-		float tread = 0.3;		// タイヤ間の距離(m)
+		float tread = 0.3;			// タイヤ間の距離(m)
 		float radius = 0.1;			// タイヤの半径(m)
 		int encoder_cpr = 2048 * 4; // エンコーダのcounts per revolution [count/rev]
 		_pnh.getParam("/twoWD/first_x", first_x);

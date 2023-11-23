@@ -101,8 +101,6 @@ public:
 
 		last_time = current_time;
 	}
-
-	//
 };
 
 int main(int argc, char **argv)
