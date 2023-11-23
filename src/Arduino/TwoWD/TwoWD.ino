@@ -20,7 +20,7 @@ custom_msgs::TwoWDAngVel wheel_vel;
 int enc_cpr = 1028 * 4;
 
 ros::NodeHandle nh;
-ros::Publisher enc_pub("TwoWD/wheelVel", &wheel_vel);
+ros::Publisher enc_pub("wheelVel", &wheel_vel);
 // ros::Publisher gainL_pub("Arduino/gainL", &gainL_msg);
 // ros::Publisher gainR_pub("Arduino/gainR", &gainR_msg);
 
@@ -55,14 +55,14 @@ void setup()
 		delay(10);
 	}
 
-	if (!nh.getParam("/Arduino/gainL", gainL_msg.data, 3))
+	if (!nh.getParam("/arduino/gainL", gainL_msg.data, 3))
 	{
 		// default values
 		gainL_msg.data[0] = 7.0; // P
 		gainL_msg.data[1] = 1.0; // I
 		gainL_msg.data[2] = 0.3; // D
 	}
-	if (!nh.getParam("/Arduino/gainR", gainR_msg.data, 3))
+	if (!nh.getParam("/arduino/gainR", gainR_msg.data, 3))
 	{
 		// default values
 		gainR_msg.data[0] = 7.0; // P
@@ -122,7 +122,7 @@ void loop()
 		wheel_vel.L = velocityPID[LEFT_MOTOR].compute();
 		wheel_vel.R = velocityPID[RIGHT_MOTOR].compute();
 	}
-	
+
 	// wheel_vel.L = velocityPID[LEFT_MOTOR].encoderToAngle(velocityPID[LEFT_MOTOR].readEncoder()) * radius;
 	// wheel_vel.R = velocityPID[RIGHT_MOTOR].readEncoder();
 
