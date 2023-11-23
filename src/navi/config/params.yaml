@@ -17,11 +17,11 @@ twoWD: {
   first_y: 0,
 
   radius: 0.1,
-  tires_dist: 0.3,
+  tread: 0.3,
   encoder_cpr: 4096,
 }
 
-Arduino: {
+arduino: {
   # PIDの順
   gainL: [14.0, 1.0, 0.3],
   gainR: [14.0, 1.0, 0.3],

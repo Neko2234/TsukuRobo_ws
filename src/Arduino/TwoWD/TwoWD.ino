@@ -6,19 +6,21 @@
 #include <ros.h>
 #include <std_msgs/Float32MultiArray.h>
 #include "custom_msgs/TwoWDAngVel.h"
-#include "custom_msgs/WheelEnc.h"
+// #include "custom_msgs/WheelEnc.h"
 
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
 
-float ang_vel[2] = {0.0, 0.0};
+float cmd_ang_vel[2] = {0.0, 0.0};
 
 std_msgs::Float32MultiArray gainL_msg; // PIDゲインを受け取るための配列
 std_msgs::Float32MultiArray gainR_msg;
-custom_msgs::WheelEnc wheel_enc;
+custom_msgs::TwoWDAngVel wheel_vel;
+// エンコーダのCPR
+int enc_cpr = 1028 * 4;
 
 ros::NodeHandle nh;
-ros::Publisher enc_pub("TwoWD/encoder", &wheel_enc);
+ros::Publisher enc_pub("TwoWD/wheelVel", &wheel_vel);
 // ros::Publisher gainL_pub("Arduino/gainL", &gainL_msg);
 // ros::Publisher gainR_pub("Arduino/gainR", &gainR_msg);
 
@@ -27,8 +29,8 @@ void angVelCb(const custom_msgs::TwoWDAngVel &ang_vel_msg)
 {
 	// ROSから来るのが100オーダーの値で、速度PIDの目標速度のオーダーが10くらいなので10で割ってる
 	// ロボットにとって前方向への移動のとき左タイヤは正方向、右タイヤは負方向に回転するので符号をつけて補正している。
-	ang_vel[LEFT_MOTOR] = ang_vel_msg.L / 10;
-	ang_vel[RIGHT_MOTOR] = -ang_vel_msg.R / 10;
+	cmd_ang_vel[LEFT_MOTOR] = ang_vel_msg.L / 10;
+	cmd_ang_vel[RIGHT_MOTOR] = -ang_vel_msg.R / 10;
 }
 
 ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("arduino/cmd_w", &angVelCb);
@@ -67,6 +69,7 @@ void setup()
 		gainR_msg.data[1] = 1.0; // I
 		gainR_msg.data[2] = 0.3; // D
 	}
+	nh.getParam("/twoWD/enc_cpr", &enc_cpr);
 
 	nh.subscribe(ang_vel_sub);
 	nh.advertise(enc_pub);
@@ -83,27 +86,20 @@ void loop()
 	//  nh.getParam("/Arduino/gainR", gainR_msg.data, 3);
 
 	static Cubic_controller::Velocity_PID velocityPID[] = {
-		{0, 0, Cubic_controller::encoderType::inc, 1028 * 4, 0.7, 0.5, gainL_msg.data[0], gainL_msg.data[1], gainL_msg.data[2], 0.0, false, true}, // L
-		{1, 1, Cubic_controller::encoderType::inc, 1028 * 4, 0.7, 0.5, gainR_msg.data[0], gainR_msg.data[1], gainR_msg.data[2], 0.0, false, true}, // R
+		{0, 0, Cubic_controller::encoderType::inc, enc_cpr, 0.7, 0.5, gainL_msg.data[0], gainL_msg.data[1], gainL_msg.data[2], 0.0, false, false}, // L
+		{1, 1, Cubic_controller::encoderType::inc, enc_cpr, 0.7, 0.5, gainR_msg.data[0], gainR_msg.data[1], gainR_msg.data[2], 0.0, false, false}, // R
 	};
 
-	if (ang_vel[LEFT_MOTOR] == 0 && ang_vel[RIGHT_MOTOR] == 0)
+	if (cmd_ang_vel[LEFT_MOTOR] == 0 && cmd_ang_vel[RIGHT_MOTOR] == 0)
 	{
 		stopFlag = true;
 	}
 	else
 	{
 		stopFlag = false;
-		velocityPID[LEFT_MOTOR].setTarget(ang_vel[LEFT_MOTOR]);
-		velocityPID[RIGHT_MOTOR].setTarget(ang_vel[RIGHT_MOTOR]);
+		velocityPID[LEFT_MOTOR].setTarget(cmd_ang_vel[LEFT_MOTOR]);
+		velocityPID[RIGHT_MOTOR].setTarget(cmd_ang_vel[RIGHT_MOTOR]);
 	}
-
-	wheel_enc.L = velocityPID[LEFT_MOTOR].readEncoder();  // - Inc_enc::get_diff(LEFT_MOTOR);
-	wheel_enc.R = velocityPID[RIGHT_MOTOR].readEncoder(); // - Inc_enc::get_diff(RIGHT_MOTOR);
-
-	enc_pub.publish(&wheel_enc);
-	//  gainL_pub.publish(&gainL_msg);
-	//  gainR_pub.publish(&gainR_msg);
 
 	if (stopFlag)
 	{
@@ -117,12 +113,21 @@ void loop()
 		{
 			DC_motor::put(i, 0);
 		}
+		wheel_vel.L = 0;
+		wheel_vel.R = 0;
 	}
 	else
 	{
 		//    nh.loginfo("Culculating");
-		velocityPID[LEFT_MOTOR].compute();
-		velocityPID[RIGHT_MOTOR].compute();
+		wheel_vel.L = velocityPID[LEFT_MOTOR].compute();
+		wheel_vel.R = velocityPID[RIGHT_MOTOR].compute();
 	}
+	
+	// wheel_vel.L = velocityPID[LEFT_MOTOR].encoderToAngle(velocityPID[LEFT_MOTOR].readEncoder()) * radius;
+	// wheel_vel.R = velocityPID[RIGHT_MOTOR].readEncoder();
+
+	enc_pub.publish(&wheel_vel);
+	//  gainL_pub.publish(&gainL_msg);
+	//  gainR_pub.publish(&gainR_msg);
 	Cubic::update();
 }
