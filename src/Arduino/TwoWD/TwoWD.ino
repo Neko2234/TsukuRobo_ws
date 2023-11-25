@@ -100,11 +100,16 @@ void loop()
 		velocityPID[LEFT_MOTOR].setTarget(cmd_ang_vel[LEFT_MOTOR]);
 		velocityPID[RIGHT_MOTOR].setTarget(cmd_ang_vel[RIGHT_MOTOR]);
 	}
+  
+  static bool stop_log_trigger = true; // 状態が遷移したときのみログを出すための制御用変数
 
 	if (stopFlag)
 	{
+    if(stop_log_trigger){
 		// Serial.println("stopping...");
-		//    nh.loginfo("Stopping...");
+		    nh.loginfo("Stopping...");
+        stop_log_trigger = false;
+    }
 
 		velocityPID[LEFT_MOTOR].reset();
 		velocityPID[RIGHT_MOTOR].reset();
@@ -118,9 +123,12 @@ void loop()
 	}
 	else
 	{
-		//    nh.loginfo("Culculating");
+    if(!stop_log_trigger){
+		    nh.loginfo("Culculating");
+        stop_log_trigger = true;
+    }
 		wheel_vel.L = velocityPID[LEFT_MOTOR].compute();
-		wheel_vel.R = velocityPID[RIGHT_MOTOR].compute();
+		wheel_vel.R = -velocityPID[RIGHT_MOTOR].compute();
 	}
 
 	// wheel_vel.L = velocityPID[LEFT_MOTOR].encoderToAngle(velocityPID[LEFT_MOTOR].readEncoder()) * radius;

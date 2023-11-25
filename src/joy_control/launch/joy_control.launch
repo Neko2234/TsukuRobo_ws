@@ -2,10 +2,10 @@
 	<rosparam command="load" file="$(find joy_control)/config/params.yaml" />
 	
 	<!-- 各ノードを起動するか否か -->
-	<arg name="arduino" default="false"/>
+	<arg name="arduino" default="true"/>
 	<arg name="joystick" default="true"/>
-	<arg name="urg" default="true"/>
-	<arg name="map_server" default="true"/>
+	<arg name="urg" default="false"/>
+	<arg name="map_server" default="false"/>
 
 	<node name="joy_node" pkg="joy" type="joy_node" />
 	<node name="joy_twist_publisher" pkg="joy_control" type="joy_twist_publisher" output="screen" required="true">
