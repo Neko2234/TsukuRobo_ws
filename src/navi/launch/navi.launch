@@ -1,13 +1,14 @@
 <launch>
 	<rosparam command="load" file="$(find navi)/config/params.yaml" />
 	
-	<arg name="arduino" 	default="false"/>
-	<arg name="joystick" 	default="false"/>
+	<arg name="arduino" 	default="true"/>
+	<arg name="joystick" 	default="true"/>
 	<arg name="urg" 		default="false"/>
 	<arg name="map_server" 	default="true"/>
 	<arg name="odom" 		default="true"/>
-	<arg name="emcl"		default="true"/>
-    <arg name="rviz"		default="true"/>
+	<arg name="emcl"		default="false"/>
+    <arg name="rviz"		default="false"/>
+	<arg name="makemap"		default="false"/>
 
 	<node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
@@ -52,6 +53,10 @@
 
 	<group if="$(arg emcl)">
         <include file="$(find navi)/launch/emcl2.launch"/>
+    </group>
+
+	<group if="$(arg makemap)">
+        <include file="$(find navi)/launch/makemap.launch"/>
     </group>
 
 	<group if="$(arg rviz)">
