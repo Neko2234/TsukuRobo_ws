@@ -38,7 +38,7 @@ namespace Cubic_controller
             Serial.println(dutyCycle);
         }
         DC_motor::put(motorNo, dutyCycle * DUTY_SPI_MAX, DUTY_SPI_MAX);
-        return dutyCycle;
+        return velocity;
     }
 
     Position_PID::Position_PID(uint8_t motorNo, uint8_t encoderNo, enum class encoderType encoderType, uint16_t CPR, double capableDutyCycle, double Kp, double Ki, double Kd, double targetAngle, bool direction, bool logging) : Controller(motorNo, encoderNo, encoderType, CPR, capableDutyCycle, Kp, Ki, Kd, targetAngle, this->encoderToAngle(this->readEncoder()), direction, logging)
