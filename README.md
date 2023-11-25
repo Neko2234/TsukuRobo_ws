@@ -2,7 +2,7 @@
 授業ロボコン2023用のROSワークスペース
 
 ## 依存パッケージ
-sudo apt-get install ros-noetic-gmapping ros-noetic-laser-scan-matcher
+sudo apt-get install ros-noetic-gmapping ros-noetic-laser-scan-matcher ros-noetic-map-server ros-noetic-navigation
 
 ## 参考
 ### 差動二輪計算
