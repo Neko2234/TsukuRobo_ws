@@ -4,8 +4,8 @@
         <param name="serial_port" value="/dev/ttyACM_URG"/>
     </node>
 
-    <!-- gmapping -->
-    <include file="$(find navi)/launch/gmapping.launch"/>
+    <!-- hectorSLAM -->
+    <include file="$(find hector_slam_launch)/launch/tutorial.launch"/>
     
     <!-- laser_scan_matcher -->
     <include file="$(find navi)/launch/laser_odometory.launch"/>
