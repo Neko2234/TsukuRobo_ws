@@ -16,7 +16,6 @@
 
 	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">
 		<remap from="cmd_w" to="arduino/cmd_w"/>
-		<remap from="wheelVel" to="twoWD/wheelVel"/>
 	</node>
 
 	<group if="$(arg odom)">
@@ -27,6 +26,7 @@
 		<node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
 			<param name="port" value="/dev/ttyACM_Arduino"/>
 			<param name="baud" value="80000000"/>
+			<remap from="wheelVel" to="twoWD/wheelVel"/>
 		</node>
 	</group>
 
