@@ -45,8 +45,8 @@ public:
 		_pnh.getParam("/twoWD/encoder_cpr", encoder_cpr);
 
 		// 指示された速度からロボット座標系から見た進む角度と速さを求める
-		float cmd_ang = atan2(_last_vel.linear.x, _last_vel.linear.y);
-		float cmd_v = hypot(_last_vel.linear.y, _last_vel.linear.x);
+		float cmd_ang = atan2(_last_vel.linear.x, _last_vel.angular.z);
+		float cmd_v = hypot(_last_vel.angular.z, _last_vel.linear.x);
 
 		// 両輪独立駆動ロボットの逆運動学計算
 		float wheel_vel[2]; // タイヤの角速度[rad/s], L,Rの順
