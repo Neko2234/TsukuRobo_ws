@@ -1,12 +1,36 @@
 <launch>
-    <!-- urg LiDAR -->
+	<rosparam command="load" file="$(find navi)/config/params.yaml" />
+	
+    <node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
+		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+	</node>
+
+	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">lxdel
+		<remap from="cmd_w" to="arduino/cmd_w"/>
+	</node>
+
+
+    <node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
+        <param name="port" value="/dev/ttyACM_Arduino"/>
+        <param name="baud" value="80000000"/>
+        <remap from="wheelVel" to="twoWD/wheelVel"/>
+    </node>
+
+    <node name="joystick" pkg="joy" type="joy_node" required="true">
+        <param name="dev" value="/dev/input/js0"/>
+    </node>
+
     <node pkg="urg_node" name="urg_node" type="urg_node" required="true">
         <param name="serial_port" value="/dev/ttyACM_URG"/>
     </node>
 
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find navi)/map/testmap.yaml" />
+
     <!-- hectorSLAM -->
     <include file="$(find hector_slam_launch)/launch/tutorial.launch"/>
     
-    <!-- laser_scan_matcher -->
-    <include file="$(find navi)/launch/laser_odometory.launch"/>
+    <!-- laser_scan_matcher
+    <include file="$(find navi)/launch/laser_odometory.launch"/> -->
+
+    <!-- <node pkg="rviz" type="rviz" name="rviz" /> -->
 </launch>    
