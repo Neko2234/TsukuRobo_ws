@@ -2,10 +2,10 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <nav_msgs/Odometry.h>
-// #include <geometry_msgs/Twist.h>
 #include <custom_msgs/TwoWDAngVel.h>
 
 class Odometry
@@ -17,8 +17,9 @@ private:
 	ros::Publisher _odom_pub;
 	ros::Publisher _vel_pub;
 	tf2_ros::TransformBroadcaster _odom_broadcaster;
+	tf2_ros::StaticTransformBroadcaster _laser_broadcaster;
 	geometry_msgs::TransformStamped _tf_base;
-	tf2::Quaternion _q_base;
+	geometry_msgs::TransformStamped _tf_laser;
 	nav_msgs::Odometry _odom;
 	// geometry_msgs::Twist _vel;
 
@@ -35,8 +36,8 @@ public:
 	Odometry() : _nh(), _pnh("~")
 	{
 		_odom_pub = _nh.advertise<nav_msgs::Odometry>("odom", 50);
-		// vel_pub = _nh.advertise<geometry_msgs::Twist>("velocity", 1);
 		_wheel_sub = _nh.subscribe("twoWD/wheelVel", 1, &Odometry::wheelCb, this);
+		broadcastLaserTf();
 		_pnh.param("/twoWD/radius", _radius);
 		_pnh.param("/twoWD/tread", _tread);
 		_pnh.param("/twoWD/enc_cpr", _enc_cpr);
@@ -80,11 +81,12 @@ public:
 		_tf_base.transform.translation.x = x;
 		_tf_base.transform.translation.y = y;
 		_tf_base.transform.translation.z = 0.0;
-		_q_base.setRPY(0.0, 0.0, th); // クォータニオンに変換
-		_tf_base.transform.rotation.x = _q_base.x();
-		_tf_base.transform.rotation.y = _q_base.y();
-		_tf_base.transform.rotation.z = _q_base.z();
-		_tf_base.transform.rotation.w = _q_base.w();
+		tf2::Quaternion q_base;
+		q_base.setRPY(0.0, 0.0, th); // RollPitchYawをクォータニオンに変換
+		_tf_base.transform.rotation.x = q_base.x();
+		_tf_base.transform.rotation.y = q_base.y();
+		_tf_base.transform.rotation.z = q_base.z();
+		_tf_base.transform.rotation.w = q_base.w();
 		// broadcast tf
 		_odom_broadcaster.sendTransform(_tf_base);
 
@@ -100,6 +102,25 @@ public:
 		_odom_pub.publish(_odom);
 
 		last_time = current_time;
+	}
+
+	// laserのtfをセット(laserはbase_linkと反対向きに設置)
+	void broadcastLaserTf()
+	{
+		_tf_laser.header.stamp = ros::Time::now();
+		_tf_laser.header.frame_id = "base_link";
+		_tf_laser.child_frame_id = "laser";
+		_tf_laser.transform.translation.x = -0.2;
+		_tf_laser.transform.translation.y = 0.0;
+		_tf_laser.transform.translation.z = 0.0;
+		tf2::Quaternion q_base;
+		q_base.setRPY(0.0, 0.0, M_PI); // クォータニオンに変換
+		_tf_laser.transform.rotation.x = q_base.x();
+		_tf_laser.transform.rotation.y = q_base.y();
+		_tf_laser.transform.rotation.z = q_base.z();
+		_tf_laser.transform.rotation.w = q_base.w();
+		// broadcast tf
+		_laser_broadcaster.sendTransform(_tf_laser);
 	}
 };
 

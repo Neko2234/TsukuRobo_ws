@@ -1,12 +1,12 @@
 joy: {
-  assign_x: 0,
-  assign_y: 1,
+  assign_x: 1,
+  assign_y: 0,
   assign_z: 3,
-  assign_x_straight: 6,
-  assign_y_straight: 7,
+  assign_x_straight: 7,
+  assign_y_straight: 6,
 
-  max_x: -0.05,
-  max_y: 0.05,
+  max_x: 0.05,
+  max_y: -0.05,
   max_z: 0.01,
   max_x_straight: -0.05,
   max_straight: -0.05,

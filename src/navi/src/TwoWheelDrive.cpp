@@ -45,23 +45,23 @@ public:
 		_pnh.getParam("/twoWD/encoder_cpr", encoder_cpr);
 
 		// 指示された速度からロボット座標系から見た進む角度と速さを求める
-		float cmd_ang = atan2(_last_vel.linear.y, _last_vel.linear.x);
-		float cmd_v = hypot(_last_vel.linear.x, _last_vel.linear.y);
+		float cmd_ang = atan2(_last_vel.linear.x, _last_vel.linear.y);
+		float cmd_v = hypot(_last_vel.linear.y, _last_vel.linear.x);
 
 		// 両輪独立駆動ロボットの逆運動学計算
-		float ang_vel[2]; // タイヤの角速度[rad/s], L,Rの順
-		ang_vel[0] = cmd_v * cos(cmd_ang - M_PI / 4);
-		ang_vel[1] = cmd_v * sin(cmd_ang - M_PI / 4);
+		float wheel_vel[2]; // タイヤの角速度[rad/s], L,Rの順
+		wheel_vel[0] = cmd_v * cos(cmd_ang - M_PI / 4);
+		wheel_vel[1] = cmd_v * sin(cmd_ang - M_PI / 4);
 
 		// 以下をターミナルに打ち込んで表示
 		/* rosrun rqt_console rqt_console */
-		ROS_DEBUG("target_ang_velL:%f", ang_vel[0]);
-		ROS_DEBUG("target_ang_velR:%f", ang_vel[1]);
+		ROS_DEBUG("target_ang_velL:%f", wheel_vel[0]);
+		ROS_DEBUG("target_ang_velR:%f", wheel_vel[1]);
 
 		// 角速度を[rad/s]からエンコーダの[count/s]に変換
 		custom_msgs::TwoWDAngVel cmd_w;
-		cmd_w.L = ang_vel[0] / (2 * M_PI) * encoder_cpr;
-		cmd_w.R = ang_vel[1] / (2 * M_PI) * encoder_cpr;
+		cmd_w.L = wheel_vel[0] / (2 * M_PI) * encoder_cpr;
+		cmd_w.R = wheel_vel[1] / (2 * M_PI) * encoder_cpr;
 
 		_w_pub.publish(cmd_w);
 	}

@@ -3,18 +3,18 @@
 	
 	<arg name="arduino" 	default="true"/>
 	<arg name="joystick" 	default="true"/>
-	<arg name="urg" 		default="false"/>
+	<arg name="urg" 		default="true"/>
 	<arg name="map_server" 	default="true"/>
 	<arg name="odom" 		default="true"/>
-	<arg name="emcl"		default="false"/>
-    <arg name="rviz"		default="false"/>
+	<arg name="emcl"		default="true"/>
+    <arg name="rviz"		default="true"/>
 	<arg name="makemap"		default="false"/>
 
 	<node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
 	</node>
 
-	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">
+	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">lxdel
 		<remap from="cmd_w" to="arduino/cmd_w"/>
 	</node>
 
@@ -43,12 +43,10 @@
 	</group>
 
 	<!-- ロボット座標系からLiDAR座標系への静的なtfを設定(LiDARはロボットから見て後ろの方を正面とする) -->
-	<node pkg="tf" type="static_transform_publisher" name="base_link_2_laser" args=" 0 0 0 3.14159 0 0 base_link base_laser 500" />
+	<node pkg="tf" type="static_transform_publisher" name="base_link_2_laser" args=" 0 0 0 3.1415926 0 0 base_link base_laser 500" />
 
 	<group if="$(arg map_server)">
-		<node name="map_server" pkg="map_server" type="map_server" args="$(find navi)/map/test1.yaml" >
-			<param name="frame_id" value="/odom"/>
-		</node>
+		<node name="map_server" pkg="map_server" type="map_server" args="$(find navi)/map/testmap.yaml" />
 	</group>
 
 	<group if="$(arg emcl)">
@@ -60,7 +58,7 @@
     </group>
 
 	<group if="$(arg rviz)">
-		<node name="rviz" pkg="rviz" type="rviz" required="true"/>
+		<node pkg="rviz" type="rviz" name="rviz" args="-d $(find navi)/rviz_cfg/mapping_demo.rviz"/>
 	</group>
 
 </launch>
