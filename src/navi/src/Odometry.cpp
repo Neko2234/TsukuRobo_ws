@@ -5,7 +5,7 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
-#include <nav_msgs/Odometry.h>
+// #include <nav_msgs/Odometry.h>
 #include <custom_msgs/TwoWDAngVel.h>
 
 class Odometry
@@ -20,7 +20,7 @@ private:
 	tf2_ros::StaticTransformBroadcaster _laser_broadcaster;
 	geometry_msgs::TransformStamped _tf_base;
 	geometry_msgs::TransformStamped _tf_laser;
-	nav_msgs::Odometry _odom;
+	// nav_msgs::Odometry _odom;
 	// geometry_msgs::Twist _vel;
 
 	// オドメトリの計算に必要な変数
@@ -35,7 +35,7 @@ private:
 public:
 	Odometry() : _nh(), _pnh("~")
 	{
-		_odom_pub = _nh.advertise<nav_msgs::Odometry>("odom", 50);
+		// _odom_pub = _nh.advertise<nav_msgs::Odometry>("odom", 50);
 		_wheel_sub = _nh.subscribe("twoWD/wheelVel", 1, &Odometry::wheelCb, this);
 		broadcastLaserTf();
 		_pnh.param("/twoWD/radius", _radius);
@@ -90,16 +90,16 @@ public:
 		// broadcast tf
 		_odom_broadcaster.sendTransform(_tf_base);
 
-		// odom message
-		_odom.header.stamp = current_time;
-		_odom.header.frame_id = "odom";
-		_odom.child_frame_id = "base_link";
-		_odom.pose.pose = setPose(x, y, th);
-		_odom.twist.twist.linear.x = _vx;
-		_odom.twist.twist.linear.y = 0.0;
-		_odom.twist.twist.angular.z = _vth;
-		// publish odom
-		_odom_pub.publish(_odom);
+		// // odom message
+		// _odom.header.stamp = current_time;
+		// _odom.header.frame_id = "odom";
+		// _odom.child_frame_id = "base_link";
+		// _odom.pose.pose = setPose(x, y, th);
+		// _odom.twist.twist.linear.x = _vx;
+		// _odom.twist.twist.linear.y = 0.0;
+		// _odom.twist.twist.angular.z = _vth;
+		// // publish odom
+		// _odom_pub.publish(_odom);
 
 		last_time = current_time;
 	}

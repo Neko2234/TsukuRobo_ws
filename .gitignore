@@ -3,7 +3,6 @@
 /logs/
 /.catkin_tools/
 /src/openslam_gmapping/
-/src/hector_slam/
 /src/slam_gmapping/
 /src/geometry2/
 /src/navigation/
