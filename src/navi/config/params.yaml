@@ -5,7 +5,7 @@ joy: {
   assign_x_straight: 6,
   assign_y_straight: 7,
 
-  max_x: -0.05,
+  max_x: 0.05,
   max_y: 0.05,
   max_z: 0.01,
   max_x_straight: -0.05,
