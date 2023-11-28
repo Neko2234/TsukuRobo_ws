@@ -3,5 +3,5 @@ global_costmap:
    robot_base_frame: base_link
    update_frequency: 1.0
    publish_frequency: 0.5
-   static_map: true
+   static_map: true # trueにすると地図を読み込む、あらかじめ地図を作っておく場合はtrue
    transform_tolerance: 0.5
