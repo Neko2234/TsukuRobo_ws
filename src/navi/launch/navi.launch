@@ -1,6 +1,6 @@
 <launch>
-	<arg name="map_file"	file="$(find navi)/map/testmap_rouka"/>
-	<rosparam command="load" file="$(find navi)/config/params.yaml" />
+	<rosparam command="load"	file="$(find navi)/config/params.yaml" />
+	<arg name="map_file"	default="$(find navi)/map/testmap_rouka.yaml"/>
 	
 	<arg name="arduino" 	default="true"/>
 	<arg name="joystick" 	default="true"/>
