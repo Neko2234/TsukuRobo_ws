@@ -1,4 +1,5 @@
 <launch>
+	<arg name="map_file"	file="$(find navi)/map/testmap_rouka"/>
 	<rosparam command="load" file="$(find navi)/config/params.yaml" />
 	
 	<arg name="arduino" 	default="true"/>
@@ -9,7 +10,6 @@
 	<arg name="emcl"		default="true"/>
     <arg name="rviz"		default="true"/>
 	<arg name="move_base"	default="true"/>
-	<arg name="makemap"		default="false"/>
 
 	<node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
@@ -47,15 +47,11 @@
 	<node pkg="tf" type="static_transform_publisher" name="base_link_2_laser" args=" 0 0 0 3.1415926 0 0 base_link base_laser 500" />
 
 	<group if="$(arg map_server)">
-		<node name="map_server" pkg="map_server" type="map_server" args="$(find navi)/map/testmap_rouka.yaml" />
+		<node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 	</group>
 
 	<group if="$(arg emcl)">
         <include file="$(find navi)/launch/emcl2.launch"/>
-    </group>
-
-	<group if="$(arg makemap)">
-        <include file="$(find navi)/launch/makemap.launch"/>
     </group>
 
 	<group if="$(arg move_base)">
