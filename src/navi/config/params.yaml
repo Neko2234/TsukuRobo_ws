@@ -1,4 +1,7 @@
 joy: {
+  # Rボタンを押しながらじゃないと動かない
+  safe_button: 5,
+
   assign_x: 1,
   assign_y: 3,
   assign_z: 0,
