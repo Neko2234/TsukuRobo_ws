@@ -109,7 +109,7 @@ public:
 	{
 		_tf_laser.header.stamp = ros::Time::now();
 		_tf_laser.header.frame_id = "base_link";
-		_tf_laser.child_frame_id = "laser";
+		_tf_laser.child_frame_id = "base_laser";
 		_tf_laser.transform.translation.x = -0.2;
 		_tf_laser.transform.translation.y = 0.0;
 		_tf_laser.transform.translation.z = 0.0;
