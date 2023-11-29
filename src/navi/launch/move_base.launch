@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
-
+<!-- yamlファイル説明
+costmap_common_params.yaml      ：グローバルとローカルコストマップのパラメータ，2つに共通するものを書く。
+local_costmap_params.yaml       ：ローカルコストマップのパラメータ
+global_costmap_params.yaml      ：グローバルコストマップのパラメータ
+base_local_planner_params.yaml  ：グローバル・ローカルプランナーのパラメータ，それぞれ設定ファイルを分けてもよい。
+move_base_params.yaml           ：move_baseのパラメータ
+ -->
 <launch>
   <master auto="start"/>
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
