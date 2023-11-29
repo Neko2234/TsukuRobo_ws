@@ -6,8 +6,8 @@ joy: {
   assign_z_rotate: 6,
 
   max_x: 0.05,
-  max_y: -0.05,
-  max_z: -0.05,
+  max_y: 0.05,
+  max_z: 0.05,
 }
 
 twoWD: {
@@ -21,6 +21,6 @@ twoWD: {
 
 arduino: {
   # PIDの順
-  gainL: [13.0, 1.0, 1.0],
-  gainR: [13.0, 1.0, 1.0],
+  gainL: [10.0, 1.0, 1.0],
+  gainR: [10.0, 1.0, 1.0],
 }
