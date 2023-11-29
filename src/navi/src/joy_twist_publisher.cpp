@@ -1,13 +1,24 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Joy.h>
+#include <std_msgs/Bool.h>
 
 class TwistPublisher
 {
+private:
+	ros::NodeHandle nh_;
+	ros::NodeHandle pnh_;
+	ros::Publisher cmd_pub_;
+	ros::Publisher safe_signal_pub_;
+	ros::Subscriber joy_sub_;
+	ros::Timer timer_;
+	sensor_msgs::Joy last_joy_;
+
 public:
 	TwistPublisher() : nh_(), pnh_("~")
 	{
 		cmd_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+		safe_signal_pub_ = nh_.advertise<std_msgs::Bool>("safe_signal", 1);
 		joy_sub_ = nh_.subscribe("joy", 10, &TwistPublisher::joyCallback, this);
 		timer_ = nh_.createTimer(ros::Duration(0.1), &TwistPublisher::timerCallback, this);
 	}
@@ -23,9 +34,11 @@ public:
 		int assign_x = 1;
 		int assign_y = 0;
 		int assign_z = 2;
+		int safe_button = 7;
 		pnh_.getParam("/joy/assign_x", assign_x);
 		pnh_.getParam("/joy/assign_y", assign_y);
 		pnh_.getParam("/joy/assign_z", assign_z);
+		pnh_.getParam("/joy/safe_button", safe_button);
 
 		// /* 差動二輪専用の処理 **十字ボタンで直進と回転**
 		int assign_x_straight = 7;
@@ -43,6 +56,8 @@ public:
 		pnh_.getParam("/joy/max_z", max_z);
 
 		geometry_msgs::Twist cmd_vel;
+
+		/* joyの入力からcmd_velを計算 */
 		// /* 差動二輪専用の処理
 		if (0 <= assign_x_straight && assign_x_straight < last_joy_.axes.size())
 		{
@@ -68,14 +83,15 @@ public:
 				cmd_vel.angular.z = max_z * last_joy_.axes[assign_z];
 		}
 		cmd_pub_.publish(cmd_vel);
-	}
 
-	ros::NodeHandle nh_;
-	ros::NodeHandle pnh_;
-	ros::Publisher cmd_pub_;
-	ros::Subscriber joy_sub_;
-	ros::Timer timer_;
-	sensor_msgs::Joy last_joy_;
+		/* 安全ボタンの処理 */
+		std_msgs::Bool safe_signal;
+		if (0 <= safe_button && safe_button < last_joy_.buttons.size())
+		{
+			safe_signal.data = last_joy_.buttons[safe_button];
+		}
+		safe_signal_pub_.publish(safe_signal);
+	}
 };
 
 int main(int argc, char **argv)
