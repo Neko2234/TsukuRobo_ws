@@ -11,6 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   custom_msgs
+  move_base
+  nav_msgs
+  sensor_msgs
   tf2
   tf2_ros
 )

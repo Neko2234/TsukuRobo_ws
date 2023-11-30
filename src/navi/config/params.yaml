@@ -1,15 +1,16 @@
 joy: {
+  # Rボタンを押しながらじゃないと動かない
+  safe_button: 5,
+
   assign_x: 1,
-  assign_y: 0,
-  assign_z: 3,
+  assign_y: 3,
+  assign_z: 0,
   assign_x_straight: 7,
-  assign_y_straight: 6,
+  assign_z_rotate: 6,
 
   max_x: 0.05,
-  max_y: -0.05,
-  max_z: 0.01,
-  max_x_straight: -0.05,
-  max_straight: -0.05,
+  max_y: 0.05,
+  max_z: 0.05,
 }
 
 twoWD: {
@@ -23,6 +24,6 @@ twoWD: {
 
 arduino: {
   # PIDの順
-  gainL: [13.0, 1.0, 1.0],
-  gainR: [13.0, 1.0, 1.0],
+  gainL: [10.0, 1.0, 1.0],
+  gainR: [10.0, 1.0, 1.0],
 }
