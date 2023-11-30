@@ -1,15 +1,16 @@
 <launch>
 	<rosparam command="load"	file="$(find navi)/config/params.yaml" />
-	<arg name="map_file"	default="$(find navi)/map/testmap_rouka.yaml"/>
-	
-	<arg name="arduino" 	default="true"/>
-	<arg name="joystick" 	default="true"/>
-	<arg name="urg" 		default="true"/>
-	<arg name="map_server" 	default="true"/>
-	<arg name="odom" 		default="true"/>
-	<arg name="emcl"		default="true"/>
-    <arg name="rviz"		default="true"/>
-	<arg name="move_base"	default="true"/>
+	<arg name="map_file"		default="$(find navi)/map/testmap_rouka.yaml"/>
+
+	<arg name="arduino" 		default="true"/>
+	<arg name="joystick" 		default="true"/>
+	<arg name="urg" 			default="true"/>
+	<arg name="map_server" 		default="true"/>
+	<arg name="odom" 			default="true"/>
+	<arg name="emcl"			default="true"/>
+    <arg name="rviz"			default="true"/>
+	<arg name="move_base"		default="false"/>
+	<arg name="move_navigation"	default="true"/>
 
 	<node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
@@ -20,6 +21,11 @@
 		<remap from="cmd_w" to="arduino/cmd_w"/>
 	</node>
 
+	<group if="$(arg move_navigation)">
+		<node name="move_navigation" pkg="navi" type="MoveNavigation" output="screen" required="true"/>
+		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+	</group>
+	
 	<group if="$(arg odom)">
 		<node name="odometry" pkg="navi" type="Odometry" output="screen" required="true"/>
 	</group>

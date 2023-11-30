@@ -16,6 +16,10 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   tf2
   tf2_ros
+  geometry_msgs
+  costmap_2d
+  base_local_planner
+  navfn
 )
 
 ## System dependencies are found with CMake's conventions
@@ -220,5 +224,9 @@ target_link_libraries(TwoWheelDrive
 )
 add_executable(Odometry src/Odometry.cpp)
 target_link_libraries(Odometry
+  ${catkin_LIBRARIES}
+)
+add_executable(MoveNavigation src/MoveNavigation.cpp)
+target_link_libraries(MoveNavigation
   ${catkin_LIBRARIES}
 )
