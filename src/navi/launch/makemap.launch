@@ -3,9 +3,10 @@
 	
     <node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+        <remap from="safe_signal" to="twoWD/safe_signal"/>
 	</node>
 
-	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">lxdel
+	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">
 		<remap from="cmd_w" to="arduino/cmd_w"/>
 	</node>
 

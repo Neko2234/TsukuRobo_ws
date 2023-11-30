@@ -49,7 +49,7 @@ private:
 public:
 	MoveNavigation() : _nh(), _pnh("~"), _tfBuffer(), _tfListener(_tfBuffer), _global_costmap("global_costmap", _tfBuffer), _local_costmap("local_costmap", _tfBuffer)
 	{
-		_goal_sub = _nh.subscribe("move_navigation/goal", 10, &MoveNavigation::goalCb, this);
+		_goal_sub = _nh.subscribe("goal", 10, &MoveNavigation::goalCb, this);
 		_twist_pub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 10);
 		_global_planner.initialize("global_planner", &_global_costmap); // 第1引数はプランナーの名前、第2引数はコストマップへのポインタ
 		_local_planner.initialize("local_planner", &_tfBuffer, &_local_costmap);

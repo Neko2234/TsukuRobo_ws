@@ -1,6 +1,7 @@
 <launch>
 	<rosparam command="load"	file="$(find navi)/config/params.yaml" />
-	<arg name="map_file"		default="$(find navi)/map/testmap_rouka.yaml"/>
+	<!-- <arg name="map_file"		default="$(find navi)/map/testmap_rouka.yaml"/> -->
+	<arg name="map_file"		default="$(find navi)/map/stage2023.yaml"/>
 
 	<arg name="arduino" 		default="true"/>
 	<arg name="joystick" 		default="true"/>
@@ -9,8 +10,8 @@
 	<arg name="odom" 			default="true"/>
 	<arg name="emcl"			default="true"/>
     <arg name="rviz"			default="true"/>
-	<arg name="move_base"		default="false"/>
-	<arg name="move_navigation"	default="true"/>
+	<arg name="move_base"		default="true"/>
+	<arg name="move_navigation"	default="false"/>
 
 	<node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
@@ -22,8 +23,9 @@
 	</node>
 
 	<group if="$(arg move_navigation)">
-		<node name="move_navigation" pkg="navi" type="MoveNavigation" output="screen" required="true"/>
-		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+		<node name="move_navigation" pkg="navi" type="MoveNavigation" output="screen" required="true">
+			<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+		</node>
 	</group>
 	
 	<group if="$(arg odom)">
