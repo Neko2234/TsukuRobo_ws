@@ -4,13 +4,14 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
+#include <custom_msgs/ArmVel.h>
 #include <math.h>
 
 enum class WallFollowState
 {
 	GOING,
 	PUTTING,
-	RETURNING,
+	BACKING,
 
 };
 
@@ -21,8 +22,10 @@ private:
 	ros::NodeHandle _pnh;
 	ros::Subscriber _scan_sub;
 	ros::Publisher _twist_pub;
+	ros::Publisher _arm_vel_pub;
 	ros::Timer _timer;
 	WallFollowState _state;
+	custom_msgs::ArmVel _arm_vel;
 	int _range_size = 10; // 中心から左右に何個のデータを取るかを定義
 	double _max_x = 0.01;
 	double _max_z = 0.01;
@@ -36,7 +39,8 @@ public:
 	{
 		_scan_sub = _nh.subscribe("scan", 10, &WallFollow::scanCb, this);
 		_twist_pub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-		_state = WallFollowState::STANDBY;
+		_arm_vel_pub = _nh.advertise<custom_msgs::ArmVel>("arm_vel", 1);
+		_state = WallFollowState::GOING;
 		_timer = _nh.createTimer(ros::Duration(0.1), &WallFollow::timerCallback, this);
 		_pnh.getParam("/wall_follow/range_size", _range_size);
 		_pnh.getParam("/joy/max_x", _max_x);
@@ -117,6 +121,13 @@ public:
 		ROS_INFO("average_distance_right: %f", _average_distance_right);
 		ROS_INFO("average_distance_left: %f", _average_distance_left);
 	};
+	void calcBackVel(geometry_msgs::Twist &twist)
+	{
+		twist.linear.x = -_max_x;
+		twist.angular.z = (_average_distance_left - _average_distance_right) * _max_z;
+		ROS_INFO("average_distance_right: %f", _average_distance_right);
+		ROS_INFO("average_distance_left: %f", _average_distance_left);
+	};
 
 	void timerCallback(const ros::TimerEvent &e)
 	{
@@ -125,17 +136,20 @@ public:
 		if (_state == WallFollowState::GOING)
 		{
 			calcGoVel(cmd_vel);
-			if (_average_distance_center < goal_x)
-			{
-				_state = WallFollowState::WALL_FOLLOWING;
-			}
-		}
-		else if (_state == WallFollowState::WALL_FOLLOWING)
-		{
 			if (_average_distance_center > goal_x)
 			{
-				_state = WallFollowState::STANDBY;
+				_state = WallFollowState::PUTTING;
 			}
+		}
+		else if (_state == WallFollowState::PUTTING)
+		{
+			_arm_vel.armopen = 1;
+			_arm_vel_pub.publish(_arm_vel);
+			_state = WallFollowState::BACKING;
+		}
+		else if (_state == WallFollowState::BACKING)
+		{
+			calcBackVel(cmd_vel);
 		}
 
 		_twist_pub.publish(cmd_vel);

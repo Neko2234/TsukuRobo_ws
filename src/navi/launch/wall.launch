@@ -4,6 +4,7 @@
 	<arg name="arduino" 		default="true"/>
 	<arg name="joystick" 		default="true"/>
 	<arg name="urg" 			default="true"/>
+	<arg name="ArmDrive" default="true"/>
 
 	<node name="Wall" pkg="navi" type="Wall" output="screen" required="true">
 		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
@@ -17,6 +18,12 @@
 	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">
 		<remap from="cmd_w" to="arduino/cmd_w"/>
 	</node>
+
+	<group if="$(arg ArmDrive)">
+		<node pkg="joy_control" name="ArmDrive" type="ArmDrive" required="true">
+			<remap from="arm_vel" to="twoWD/arm_vel"/>
+		</node>
+	</group>
 
 	<group if="$(arg arduino)">
 		<node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
@@ -37,8 +44,8 @@
 			<param name="frame_id" value="base_laser"/>
 			<param name="serial_port" value="/dev/ttyACM_URG"/>
 			<!-- <param name="ip_address"    value="192.168.0.10"/> -->
-			<param name="angle_max" value="1.2"/>
-            <param name="angle_min" value="-1.2"/>
+			<param name="angle_max" value="1.4"/>
+            <param name="angle_min" value="-1.4"/>
 		</node>
 	</group>
 </launch>

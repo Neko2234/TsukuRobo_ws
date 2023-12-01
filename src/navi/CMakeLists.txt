@@ -234,3 +234,7 @@ add_executable(Wall src/Wall.cpp)
 target_link_libraries(Wall
   ${catkin_LIBRARIES}
 )
+add_executable(ArmDrive src/ArmDrive.cpp)
+target_link_libraries(ArmDrive
+  ${catkin_LIBRARIES}
+)
