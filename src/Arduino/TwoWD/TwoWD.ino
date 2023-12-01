@@ -7,15 +7,22 @@
 #include <std_msgs/Float32MultiArray.h>
 #include "custom_msgs/TwoWDAngVel.h"
 #include "custom_msgs/WheelEnc.h"
+#include "custom_msgs/ArmVel.h"
 
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
 
+int arm_duty = 0;
+int arm_enc_num = 2;
 float ang_vel[2] = {0.0, 0.0};
+float arm_vel = 0.0;
+int16_t arm_enc = 0;
+bool Boolen = false;
 
 std_msgs::Float32MultiArray gainL_msg; // PIDゲインを受け取るための配列
 std_msgs::Float32MultiArray gainR_msg;
 custom_msgs::WheelEnc wheel_enc;
+
 
 ros::NodeHandle nh;
 ros::Publisher enc_pub("TwoWD/encoder", &wheel_enc);
@@ -32,6 +39,17 @@ void angVelCb(const custom_msgs::TwoWDAngVel &ang_vel_msg)
 }
 
 ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("arduino/cmd_w", &angVelCb);
+
+// 単位は[count/sec]
+void armVelCb(const custom_msgs::ArmVel &arm_vel_msg)
+{
+	// ROSから来るのが100オーダーの値で、速度PIDの目標速度のオーダーが10くらいなので10で割ってる
+	// ロボットにとって前方向への移動のとき左タイヤは正方向、右タイヤは負方向に回転するので符号をつけて補正している。
+	arm_vel = arm_vel_msg.vel * 2000;
+  Boolen = true;
+}
+
+ros::Subscriber<custom_msgs::ArmVel> arm_vel_sub("twoWD/arm_vel", &armVelCb);
 
 void setup()
 {
@@ -69,9 +87,14 @@ void setup()
 	}
 
 	nh.subscribe(ang_vel_sub);
+  nh.subscribe(arm_vel_sub);
 	nh.advertise(enc_pub);
 	// nh.advertise(gainL_pub);
 	// nh.advertise(gainR_pub);
+  pinMode(24,OUTPUT);
+  pinMode(23,OUTPUT);
+  digitalWrite(23,HIGH);
+  digitalWrite(24,HIGH);
 }
 
 void loop()
@@ -100,7 +123,16 @@ void loop()
 
 	wheel_enc.L = velocityPID[LEFT_MOTOR].readEncoder();  // - Inc_enc::get_diff(LEFT_MOTOR);
 	wheel_enc.R = velocityPID[RIGHT_MOTOR].readEncoder(); // - Inc_enc::get_diff(RIGHT_MOTOR);
-
+  arm_enc = Inc_enc::get(arm_enc_num);
+  if(arm_vel<0){
+      arm_duty = arm_vel;
+  }else if(arm_vel>0){
+    arm_duty = arm_vel;
+  }else{
+    digitalWrite(24,LOW);
+    arm_duty = 0;
+  }
+  DC_motor::put(2,arm_duty);
 	enc_pub.publish(&wheel_enc);
 	//  gainL_pub.publish(&gainL_msg);
 	//  gainR_pub.publish(&gainR_msg);
@@ -124,5 +156,11 @@ void loop()
 		velocityPID[LEFT_MOTOR].compute();
 		velocityPID[RIGHT_MOTOR].compute();
 	}
+  if (Boolen == true){
+    digitalWrite(23,LOW);
+    Boolen = false;}
+    
+  
+  
 	Cubic::update();
 }
