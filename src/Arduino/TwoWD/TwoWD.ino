@@ -15,8 +15,13 @@
 int arm_duty = 0;
 int arm_enc_num = 2;
 float cmd_ang_vel[2] = {0.0, 0.0};
-float arm_vel = 0.0;
+float arm_vel = 450;
 int16_t arm_enc = 0;
+
+bool arm_open; //閉じる-true,開ける-false,そのまま-変動しない
+enum class Arm_queue {Open,Close,Standby};
+float openArmEnc = 100;
+float closeArmEnc = 10;
 
 std_msgs::Float32MultiArray gainL_msg; // PIDゲインを受け取るための配列
 std_msgs::Float32MultiArray gainR_msg;
@@ -47,7 +52,7 @@ void armVelCb(const custom_msgs::ArmVel &arm_vel_msg)
 {
 	// ROSから来るのが100オーダーの値で、速度PIDの目標速度のオーダーが10くらいなので10で割ってる
 	// ロボットにとって前方向への移動のとき左タイヤは正方向、右タイヤは負方向に回転するので符号をつけて補正している。
-	arm_vel = arm_vel_msg.vel * 2000;
+	//arm_vel = arm_vel_msg.vel * 20 * 250;
 }
 
 ros::Subscriber<custom_msgs::ArmVel> arm_vel_sub("twoWD/arm_vel", &armVelCb);
@@ -122,22 +127,9 @@ void loop()
 		velocityPID[LEFT_MOTOR].setTarget(cmd_ang_vel[LEFT_MOTOR]);
 		velocityPID[RIGHT_MOTOR].setTarget(cmd_ang_vel[RIGHT_MOTOR]);
 	}
-
-  arm_enc = Inc_enc::get(arm_enc_num);
-  if(arm_vel<0){
-      arm_duty = 100;
-      digitalWrite(23,LOW);
-      digitalWrite(24,HIGH);
-  }else if(arm_vel>0){
-    arm_duty = -100;
-      digitalWrite(23,HIGH);
-      digitalWrite(24,LOW);
-  }else{
-    digitalWrite(23,LOW);
-    digitalWrite(24,LOW);
-    arm_duty = 0;
-  }
-  DC_motor::put(2,arm_duty);
+  
+  
+  
 
 	//wheel_enc.L = velocityPID[LEFT_MOTOR].readEncoder();  // - Inc_enc::get_diff(LEFT_MOTOR);
 	//wheel_enc.R = velocityPID[RIGHT_MOTOR].readEncoder(); // - Inc_enc::get_diff(RIGHT_MOTOR);
@@ -175,6 +167,23 @@ void loop()
 		wheel_vel.L = velocityPID[LEFT_MOTOR].compute();
 		wheel_vel.R = -velocityPID[RIGHT_MOTOR].compute();
 	}
+
+  arm_enc = Inc_enc::get(arm_enc_num);
+  float arm_accel = pow(1-pow(2*arm_enc/(closeArmEnc+openArmEnc),2),0.5);
+  if(arm_enc>closeArmEnc&&arm_open==false){
+    arm_duty = -1*arm_accel*arm_vel;
+    //digitalWrite(23,LOW);
+    //digitalWrite(24,HIGH);
+  }else if(arm_enc<openArmEnc&&arm==true){
+    arm_duty = arm_accel*arm_vel;
+    //digitalWrite(23,HIGH);
+    //digitalWrite(24,LOW);
+  }else{
+    //digitalWrite(23,LOW);
+    //digitalWrite(24,LOW);
+    arm_duty = 0;
+  }
+  DC_motor::put(2,arm_duty);
 
 
 
