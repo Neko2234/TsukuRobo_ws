@@ -230,3 +230,7 @@ add_executable(MoveNavigation src/MoveNavigation.cpp)
 target_link_libraries(MoveNavigation
   ${catkin_LIBRARIES}
 )
+add_executable(Wall src/Wall.cpp)
+target_link_libraries(Wall
+  ${catkin_LIBRARIES}
+)
