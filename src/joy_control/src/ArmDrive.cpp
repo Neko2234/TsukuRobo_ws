@@ -3,8 +3,8 @@
 #include <geometry_msgs/Twist.h>
 #include <custom_msgs/ArmVel.h>
 
-// ロボット速度指令をタイヤへの回転速度指令に変換
-class TwoWDSpeedConverter{
+// ロボットの自己位置推定信号からアームの開閉判断信号に変換
+class ArmQueueConverter{
 	private:
 	float theta_now = M_PI/2; // オドメトリ座標系から見た現在のロボットの角度(rad)
 
@@ -17,11 +17,11 @@ class TwoWDSpeedConverter{
 	custom_msgs::ArmVel _last_vel;
 
 	// コンストラクタ
-	TwoWDSpeedConverter() : _nh(), _pnh("~"){
+	ArmQueueConverter() : _nh(), _pnh("~"){
 		_arm_pub = _nh.advertise<custom_msgs::ArmVel>("arm_vel",1);
-		_vel_sub = _nh.subscribe("cmd_armvel", 10, &TwoWDSpeedConverter::velCb, this);
+		_vel_sub = _nh.subscribe("cmd_armvel", 10, &ArmQueueConverter::velCb, this);
 		// 10Hzでタイマーコールバックを呼び出す。
-		_timer = _nh.createTimer(ros::Duration(0.1), &TwoWDSpeedConverter::timerCb, this);
+		_timer = _nh.createTimer(ros::Duration(0.1), &ArmQueueConverter::timerCb, this);
 	}
 
 	void velCb(const custom_msgs::ArmVel &cmd_vel_msg){
@@ -37,6 +37,12 @@ class TwoWDSpeedConverter{
 		// 角速度を[rad/s]からエンコーダの[count/s]に変換
 		custom_msgs::ArmVel arm_vel;
 		arm_vel.vel = _last_vel.vel;
+		arm_vel.armopen = true;
+		// if(アームを広げたい条件){
+		// 	arm_vel.armopen = true;
+		// }else if(アームを閉じたい条件){
+		// 	arm_vel.armopen = false;
+		// }
 
 		_arm_pub.publish(arm_vel);
 	}
@@ -45,7 +51,7 @@ class TwoWDSpeedConverter{
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "two_wheel_drive");
-  TwoWDSpeedConverter speed_converter;
+  ArmQueueConverter speed_converter;
   ros::Rate rate(100);
   while(ros::ok()){
   	ros::spinOnce();
