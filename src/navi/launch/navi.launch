@@ -1,0 +1,78 @@
+<launch>
+	<rosparam command="load"	file="$(find navi)/config/params.yaml" />
+	<!-- <arg name="map_file"		default="$(find navi)/map/testmap_rouka.yaml"/> -->
+	<arg name="map_file"		default="$(find navi)/map/stage2023.yaml"/>
+
+	<arg name="arduino" 		default="true"/>
+	<arg name="joystick" 		default="true"/>
+	<arg name="urg" 			default="true"/>
+	<arg name="map_server" 		default="true"/>
+	<arg name="odom" 			default="true"/>
+	<arg name="emcl"			default="true"/>
+    <arg name="rviz"			default="true"/>
+	<arg name="move_base"		default="true"/>
+	<arg name="move_navigation"	default="false"/>
+
+	<node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
+		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+		<remap from="safe_signal" to="twoWD/safe_signal"/>
+	</node>
+
+	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">
+		<remap from="cmd_w" to="arduino/cmd_w"/>
+	</node>
+
+	<group if="$(arg move_navigation)">
+		<node name="move_navigation" pkg="navi" type="MoveNavigation" output="screen" required="true">
+			<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+		</node>
+	</group>
+	
+	<group if="$(arg odom)">
+		<node name="odometry" pkg="navi" type="Odometry" output="screen" required="true"/>
+	</group>
+
+	<group if="$(arg arduino)">
+		<node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
+			<param name="port" value="/dev/ttyACM_Arduino"/>
+			<param name="baud" value="80000000"/>
+			<remap from="wheelVel" to="twoWD/wheelVel"/>
+		</node>
+	</group>
+
+	<group if="$(arg joystick)">
+		<node name="joystick" pkg="joy" type="joy_node" required="true">
+			<param name="dev" value="/dev/input/js0"/>
+		</node>
+	</group>
+
+	<group if="$(arg urg)">
+		<node pkg="urg_node" name="urg_node" type="urg_node" required="true">
+			<param name="frame_id" value="base_laser"/>
+			<param name="serial_port" value="/dev/ttyACM_URG"/>
+			<!-- <param name="ip_address"    value="192.168.0.10"/> -->
+			<param name="angle_max" value="1.2"/>
+            <param name="angle_min" value="-1.2"/>
+		</node>
+	</group>
+
+	<!-- ロボット座標系からLiDAR座標系への静的なtfを設定(LiDARはロボットから見て後ろの方を正面とする) -->
+	<!-- <node pkg="tf" type="static_transform_publisher" name="base_link_2_laser" args=" 0 0 0 3.1415926 0 0 base_link base_laser 500" /> -->
+
+	<group if="$(arg map_server)">
+		<node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+	</group>
+
+	<group if="$(arg emcl)">
+        <include file="$(find navi)/launch/emcl2.launch"/>
+    </group>
+
+	<group if="$(arg move_base)">
+        <include file="$(find navi)/launch/move_base.launch"/>
+    </group>
+
+	<group if="$(arg rviz)">
+		<node pkg="rviz" type="rviz" name="rviz" args="-d $(find navi)/rviz_cfg/mapping_demo.rviz"/>
+	</group>
+
+</launch>

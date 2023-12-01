@@ -10,6 +10,16 @@ project(navi)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  custom_msgs
+  move_base
+  nav_msgs
+  sensor_msgs
+  tf2
+  tf2_ros
+  geometry_msgs
+  costmap_2d
+  base_local_planner
+  navfn
 )
 
 ## System dependencies are found with CMake's conventions
@@ -203,3 +213,20 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+include_directories(include ${catkin_INCLUDE_DIRS})
+add_executable(joy_twist_publisher src/joy_twist_publisher.cpp)
+target_link_libraries(joy_twist_publisher
+  ${catkin_LIBRARIES}
+)
+add_executable(TwoWheelDrive src/TwoWheelDrive.cpp)
+target_link_libraries(TwoWheelDrive
+  ${catkin_LIBRARIES}
+)
+add_executable(Odometry src/Odometry.cpp)
+target_link_libraries(Odometry
+  ${catkin_LIBRARIES}
+)
+add_executable(MoveNavigation src/MoveNavigation.cpp)
+target_link_libraries(MoveNavigation
+  ${catkin_LIBRARIES}
+)

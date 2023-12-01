@@ -1,0 +1,9 @@
+digraph G {
+"base_link" -> "base_laser"[label="Broadcaster: /odometry\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1701231032.399 sec old)\nBuffer length: 0.000 sec\n"];
+"odom" -> "base_link"[label="Broadcaster: /odometry\nAverage rate: 100.202 Hz\nMost recent transform: 1701231032.391 ( 0.008 sec old)\nBuffer length: 4.980 sec\n"];
+"map" -> "odom"[label="Broadcaster: /emcl2_node\nAverage rate: 10.205 Hz\nMost recent transform: 1701231032.510 ( -0.111 sec old)\nBuffer length: 4.997 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1701231032.399"[ shape=plaintext ] ;
+ }->"map";
+}

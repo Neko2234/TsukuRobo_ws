@@ -1,0 +1,39 @@
+TrajectoryPlannerROS:
+
+# Robot Configuration Parameters
+  max_vel_x: 0.3
+  min_vel_x: 0.1
+
+  max_vel_theta:  0.5
+  min_vel_theta: -0.5
+  min_in_place_vel_theta: 0.01
+  
+  acc_lim_x: 0.5
+  acc_lim_theta: 0.5
+
+# 目標許容誤差
+  yaw_goal_tolerance: 0.05
+  xy_goal_tolerance: 0.10
+
+# 順方向のシミュレーションについての設定
+  sim_time: 2.0
+  vx_samples: 6
+  vtheta_samples: 20
+
+# 軌道スコアリングパラメータ
+  meter_scoring: true
+  pdist_scale: 0.6 # コントローラーが指定されたパスの近くにどれだけ留まるかの重み付け。最大値は 5.0
+  gdist_scale: 0.8 # コントローラーがローカル目標に到達するためにどの程度の量を試行するかを重み付けし、速度も制御。最大値は 5.0
+  occdist_scale: 0.01 # コントローラーが障害物を回避しようとする量の重み付け
+  heading_lookahead: 0.325 # さまざまなその場回転軌道を記録するときに、メートル単位でどこまで先を見るべきか
+  dwa: true # Dynamic Window Approach (DWA)_ を使用するかどうか
+
+# 発振防止パラメータ
+  oscillation_reset_dist: 0.05 # 発振フラグがリセットされるまでにロボットが移動しなければならない距離 
+
+# Differential-drive robot configuration
+  holonomic_robot: false # ロボットが横にも動けるときに true にする
+  max_vel_y: 0.0
+  min_vel_y: 0.0
+  acc_lim_y: 0.0
+  vy_samples: 0

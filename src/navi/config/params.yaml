@@ -1,15 +1,16 @@
 joy: {
-  assign_x: 0,
-  assign_y: 1,
-  assign_z: 3,
-  assign_x_straight: 6,
-  assign_y_straight: 7,
+  # Rボタンを押しながらじゃないと動かない
+  safe_button: 5,
 
-  max_x: -0.1,
-  max_y: 0.1,
+  assign_x: 1,
+  assign_y: 3,
+  assign_z: 0,
+  assign_x_straight: 7,
+  assign_z_rotate: 6,
+
+  max_x: 0.05,
+  max_y: 0.05,
   max_z: 0.05,
-  max_x_straight: -0.1,
-  max_straight: -0.1,
 }
 
 twoWD: {
@@ -17,12 +18,12 @@ twoWD: {
   first_y: 0,
 
   radius: 0.1,
-  tires_dist: 0.3,
-  encoder_cpr: 4096,
+  tread: 0.3,
+  enc_cpr: 4096,
 }
 
-Arduino: {
+arduino: {
   # PIDの順
-  gainL: [14.0, 1.0, 0.3],
-  gainR: [14.0, 1.0, 0.3],
+  gainL: [10.0, 1.0, 1.0],
+  gainR: [10.0, 1.0, 1.0],
 }
