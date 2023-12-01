@@ -7,19 +7,32 @@
 #include <std_msgs/Float32MultiArray.h>
 #include "custom_msgs/TwoWDAngVel.h"
 // #include "custom_msgs/WheelEnc.h"
+#include "custom_msgs/ArmVel.h"
 
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
 
+float arm_duty = 0;
+int arm_enc_num = 2;
 float cmd_ang_vel[2] = {0.0, 0.0};
+float arm_vel = 350;
+int16_t arm_enc = 0;
+float arm_accel = 0;
+
+bool arm_queue_change=true;
+bool arm_open = true; // 閉じる-true,開ける-false,そのまま-変動しない
+float openArmEnc = 17700;
+float closeArmEnc = 16000;
 
 std_msgs::Float32MultiArray gainL_msg; // PIDゲインを受け取るための配列
 std_msgs::Float32MultiArray gainR_msg;
 custom_msgs::TwoWDAngVel wheel_vel;
+
 // エンコーダのCPR
 int enc_cpr = 1028 * 4;
 
 ros::NodeHandle nh;
+
 ros::Publisher enc_pub("wheelVel", &wheel_vel);
 // ros::Publisher gainL_pub("Arduino/gainL", &gainL_msg);
 // ros::Publisher gainR_pub("Arduino/gainR", &gainR_msg);
@@ -34,6 +47,16 @@ void angVelCb(const custom_msgs::TwoWDAngVel &ang_vel_msg)
 }
 
 ros::Subscriber<custom_msgs::TwoWDAngVel> ang_vel_sub("arduino/cmd_w", &angVelCb);
+
+// 単位は[count/sec]
+void armVelCb(const custom_msgs::ArmVel &arm_vel_msg)
+{
+	// ROSから来るのが100オーダーの値で、速度PIDの目標速度のオーダーが10くらいなので10で割ってる
+	// ロボットにとって前方向への移動のとき左タイヤは正方向、右タイヤは負方向に回転するので符号をつけて補正している。
+	arm_open = arm_vel_msg.vel;
+}
+
+ros::Subscriber<custom_msgs::ArmVel> arm_vel_sub("twoWD/arm_vel", &armVelCb);
 
 void setup()
 {
@@ -72,9 +95,14 @@ void setup()
 	nh.getParam("/twoWD/enc_cpr", &enc_cpr);
 
 	nh.subscribe(ang_vel_sub);
+	nh.subscribe(arm_vel_sub);
 	nh.advertise(enc_pub);
 	// nh.advertise(gainL_pub);
 	// nh.advertise(gainR_pub);
+	pinMode(24, OUTPUT);
+	pinMode(23, OUTPUT);
+	digitalWrite(23, HIGH);
+	digitalWrite(24, HIGH);
 }
 
 void loop()
@@ -100,16 +128,24 @@ void loop()
 		velocityPID[LEFT_MOTOR].setTarget(cmd_ang_vel[LEFT_MOTOR]);
 		velocityPID[RIGHT_MOTOR].setTarget(cmd_ang_vel[RIGHT_MOTOR]);
 	}
-  
-  static bool stop_log_trigger = true; // 状態が遷移したときのみログを出すための制御用変数
+
+	// wheel_enc.L = velocityPID[LEFT_MOTOR].readEncoder();  // - Inc_enc::get_diff(LEFT_MOTOR);
+	// wheel_enc.R = velocityPID[RIGHT_MOTOR].readEncoder(); // - Inc_enc::get_diff(RIGHT_MOTOR);
+
+	// enc_pub.publish(&wheel_enc);
+	//   gainL_pub.publish(&gainL_msg);
+	//   gainR_pub.publish(&gainR_msg);
+
+	static bool stop_log_trigger = true; // 状態が遷移したときのみログを出すための制御用変数
 
 	if (stopFlag)
 	{
-    if(stop_log_trigger){
-		// Serial.println("stopping...");
-		    nh.loginfo("Stopping...");
-        stop_log_trigger = false;
-    }
+		if (stop_log_trigger)
+		{
+			// Serial.println("stopping...");
+			nh.loginfo("Stopping...");
+			stop_log_trigger = false;
+		}
 
 		velocityPID[LEFT_MOTOR].reset();
 		velocityPID[RIGHT_MOTOR].reset();
@@ -123,13 +159,38 @@ void loop()
 	}
 	else
 	{
-    if(!stop_log_trigger){
-		    nh.loginfo("Culculating");
-        stop_log_trigger = true;
-    }
+		if (!stop_log_trigger)
+		{
+			nh.loginfo("Culculating");
+			stop_log_trigger = true;
+		}
 		wheel_vel.L = velocityPID[LEFT_MOTOR].compute();
 		wheel_vel.R = -velocityPID[RIGHT_MOTOR].compute();
 	}
+
+	arm_enc = Inc_enc::get(arm_enc_num);
+  arm_accel=1;
+  
+	if (arm_enc > closeArmEnc && arm_open == false)
+	{
+		arm_duty = arm_accel * arm_vel;
+		// digitalWrite(23,LOW);
+		// digitalWrite(24,HIGH);
+	}
+	else if (arm_enc < openArmEnc && arm_open == true)
+	{
+		arm_duty = -1 * arm_accel * arm_vel;
+		// digitalWrite(23,HIGH);
+		// digitalWrite(24,LOW);
+	}
+	else
+	{
+		// digitalWrite(23,LOW);
+		// digitalWrite(24,LOW);
+		arm_duty = 0;
+	}
+
+	DC_motor::put(2, arm_duty);
 
 	// wheel_vel.L = velocityPID[LEFT_MOTOR].encoderToAngle(velocityPID[LEFT_MOTOR].readEncoder()) * radius;
 	// wheel_vel.R = velocityPID[RIGHT_MOTOR].readEncoder();
@@ -137,5 +198,6 @@ void loop()
 	enc_pub.publish(&wheel_vel);
 	//  gainL_pub.publish(&gainL_msg);
 	//  gainR_pub.publish(&gainR_msg);
+
 	Cubic::update();
 }

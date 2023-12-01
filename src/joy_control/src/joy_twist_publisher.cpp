@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Joy.h>
+#include <custom_msgs/ArmVel.h>
 
 class TwistPublisher
 {
@@ -8,6 +9,7 @@ public:
   TwistPublisher() : nh_(), pnh_("~")
   {
     cmd_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    cmd_armpub_ = nh_.advertise<custom_msgs::ArmVel>("cmd_armvel", 1);
     joy_sub_ = nh_.subscribe("joy", 10, &TwistPublisher::joyCallback, this);
     timer_ = nh_.createTimer(ros::Duration(0.1), &TwistPublisher::timerCallback, this);
   }
@@ -23,9 +25,11 @@ public:
     int assign_x = 1;
     int assign_y = 0;
     int assign_z = 2;
+    int assign_arm = 4;
     pnh_.getParam("/joy/assign_x", assign_x);
     pnh_.getParam("/joy/assign_y", assign_y);
     pnh_.getParam("/joy/assign_z", assign_z);
+    pnh_.getParam("/joy/assign_arm", assign_arm);
 
     int assign_x_straight = 7;
     int assign_y_straight = 6;
@@ -36,9 +40,11 @@ public:
     float max_x = 1.0;
     float max_y = 1.0;
     float max_z = 1.0;
+    float max_arm = 1.0;
     pnh_.getParam("/joy/max_x", max_x);
     pnh_.getParam("/joy/max_y", max_y);
     pnh_.getParam("/joy/max_z", max_z);
+    pnh_.getParam("/joy/max_arm", max_arm);
 
     geometry_msgs::Twist cmd_vel;
     if(0 <= assign_x_straight && assign_x_straight < last_joy_.axes.size()){
@@ -60,11 +66,18 @@ public:
       cmd_vel.angular.z = max_z * last_joy_.axes[assign_z];
     }
     cmd_pub_.publish(cmd_vel);
+    
+    custom_msgs::ArmVel cmd_armvel;
+    if(0 <= assign_arm && assign_arm < last_joy_.axes.size()){
+      cmd_armvel.vel = max_arm * last_joy_.axes[assign_arm];
+    }
+    cmd_armpub_.publish(cmd_armvel);
   }
 
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
   ros::Publisher cmd_pub_;
+  ros::Publisher cmd_armpub_;
   ros::Subscriber joy_sub_;
   ros::Timer timer_;
   sensor_msgs::Joy last_joy_;

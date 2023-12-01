@@ -51,6 +51,7 @@ add_message_files(
   FILES
   TwoWDAngVel.msg
   WheelEnc.msg
+  ArmVel.msg
 )
 
 ## Generate services in the 'srv' folder

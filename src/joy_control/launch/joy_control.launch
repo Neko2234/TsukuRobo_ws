@@ -5,6 +5,7 @@
 	<arg name="arduino" default="true"/>
 	<arg name="joystick" default="true"/>
 	<arg name="urg" default="false"/>
+	<arg name="ArmDrive" default="true"/>
 	<arg name="map_server" default="false"/>
 
 	<node name="joy_node" pkg="joy" type="joy_node" />
@@ -18,14 +19,14 @@
 
 	<group if="$(arg arduino)">
 		<node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
-			<param name="port" value="/dev/ttyACM_Arduino"/>
+			<param name="port" value="/dev/ttyACM0"/>
 			<param name="baud" value="80000000"/>
 		</node>
 	</group>
 
 	<group if="$(arg joystick)">
 		<node name="joystick" pkg="joy" type="joy_node" required="true">
-			<param name="dev" value="/dev/input/js0"/>
+			<param name="dev" value="/dev/input/js2"/>
 		</node>
 	</group>
 
@@ -41,6 +42,12 @@
 	<group if="$(arg map_server)">
 		<node name="map_server" pkg="map_server" type="map_server" args="$(find joy_control)/map/map.yaml" >
 			<param name="frame_id" value="odom"/>
+		</node>
+	</group>
+
+	<group if="$(arg ArmDrive)">
+		<node pkg="joy_control" name="ArmDrive" type="ArmDrive" required="true">
+			<remap from="arm_vel" to="twoWD/arm_vel"/>
 		</node>
 	</group>
 </launch>
