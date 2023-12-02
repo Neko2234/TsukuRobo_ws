@@ -1,6 +1,7 @@
 joy: {
   # Rボタンを押しながらじゃないと動かない
   safe_button: 5,
+  joy_control_button: 7,
 
   assign_x: 1,
   assign_y: 3,
@@ -8,18 +9,23 @@ joy: {
   assign_x_straight: 7,
   assign_z_rotate: 6,
 
-  max_x: 0.05,
-  max_y: 0.05,
-  max_z: 0.05,
+  max_x: 0.02,
+  max_y: 0.01,
+  max_z: 0.0105
 }
 
 twoWD: {
   first_x: 0,
   first_y: 0,
 
-  radius: 0.1,
-  tread: 0.3,
+  radius: 0.12,
+  tread: 0.48,
   enc_cpr: 4096,
+}
+
+wall_follow: {
+  goal_x: 5.0,
+  range_size: 10,
 }
 
 arduino: {

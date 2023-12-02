@@ -1,0 +1,51 @@
+<launch>
+	<rosparam command="load"	file="$(find navi)/config/params.yaml" />
+
+	<arg name="arduino" 		default="true"/>
+	<arg name="joystick" 		default="true"/>
+	<arg name="urg" 			default="true"/>
+	<arg name="ArmDrive" default="true"/>
+
+	<node name="Wall" pkg="navi" type="Wall" output="screen" required="true">
+		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+	</node>
+
+	<node name="joy_twist_publisher" pkg="navi" type="joy_twist_publisher" output="screen" required="true">
+		<remap from="cmd_vel" to="twoWD/cmd_vel"/>
+		<remap from="safe_signal" to="twoWD/safe_signal"/>
+	</node>
+
+	<node name="TwoWheelDrive" pkg="navi" type="TwoWheelDrive">
+		<remap from="cmd_w" to="arduino/cmd_w"/>
+	</node>
+
+	<group if="$(arg ArmDrive)">
+		<node pkg="joy_control" name="ArmDrive" type="ArmDrive" required="true">
+			<remap from="arm_vel" to="twoWD/arm_vel"/>
+		</node>
+	</group>
+
+	<group if="$(arg arduino)">
+		<node name="aruduino" pkg="rosserial_arduino" type="serial_node.py" required="true"  output="screen">
+			<param name="port" value="/dev/ttyACM_Arduino"/>
+			<param name="baud" value="80000000"/>
+			<remap from="wheelVel" to="twoWD/wheelVel"/>
+		</node>
+	</group>
+
+	<group if="$(arg joystick)">
+		<node name="joystick" pkg="joy" type="joy_node" required="true">
+			<param name="dev" value="/dev/input/js0"/>
+		</node>
+	</group>
+
+	<group if="$(arg urg)">
+		<node pkg="urg_node" name="urg_node" type="urg_node" required="true">
+			<param name="frame_id" value="base_laser"/>
+			<param name="serial_port" value="/dev/ttyACM_URG"/>
+			<!-- <param name="ip_address"    value="192.168.0.10"/> -->
+			<param name="angle_max" value="1.4"/>
+            <param name="angle_min" value="-1.4"/>
+		</node>
+	</group>
+</launch>
