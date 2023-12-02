@@ -53,7 +53,7 @@ void armVelCb(const custom_msgs::ArmVel &arm_vel_msg)
 {
 	// ROSから来るのが100オーダーの値で、速度PIDの目標速度のオーダーが10くらいなので10で割ってる
 	// ロボットにとって前方向への移動のとき左タイヤは正方向、右タイヤは負方向に回転するので符号をつけて補正している。
-	arm_open = arm_vel_msg.vel;
+	arm_open = arm_vel_msg.armopen;
 }
 
 ros::Subscriber<custom_msgs::ArmVel> arm_vel_sub("twoWD/arm_vel", &armVelCb);
