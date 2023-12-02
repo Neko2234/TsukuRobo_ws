@@ -21,8 +21,8 @@ float arm_accel = 0;
 
 bool arm_queue_change=true;
 bool arm_open = true; // 閉じる-true,開ける-false,そのまま-変動しない
-float openArmEnc = 17700;
-float closeArmEnc = 16000;
+float openArmEnc = 0;
+float closeArmEnc = -1700;
 
 std_msgs::Float32MultiArray gainL_msg; // PIDゲインを受け取るための配列
 std_msgs::Float32MultiArray gainR_msg;
@@ -62,6 +62,10 @@ void setup()
 {
 	Cubic::begin();
 	// Serial.begin(115200);
+
+	arm_enc = Inc_enc::get(arm_enc_num);
+	openArmEnc += arm_enc;
+	closeArmEnc += arm_enc;
 
 	nh.getHardware()->setBaud(80000000);
 	nh.initNode();
